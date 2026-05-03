@@ -87,8 +87,7 @@
             padding-bottom: 80px; /* 增加底部填充，确保内容不被遮挡 */
         }
         .view.active {
-            display: flex !important; /* 改为 flex 布局以更好地控制子元素 */
-            flex-direction: column;
+            display: block !important; /* 恢复为 block 布局，flex 在某些移动端滚动容器中会有兼容性问题 */
             animation: fadeIn 0.3s ease-out;
         }
         @keyframes fadeIn {
@@ -274,7 +273,7 @@
     </main>
 
     <!-- 视图：个人中心 -->
-    <main id="view-profile" class="view p-6 space-y-6 pb-10">
+    <main id="view-profile" class="view p-6 space-y-6">
         <!-- 用户信息与统计简报 -->
         <div class="bg-white rounded-3xl shadow-soft p-6 border border-primary-50 flex items-center gap-4">
             <div class="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center text-primary-600 text-2xl font-bold">
@@ -298,7 +297,7 @@
         </div>
 
         <!-- 系统设置 -->
-        <div class="bg-white rounded-3xl shadow-soft border border-primary-50 overflow-hidden">
+        <div class="bg-white rounded-3xl shadow-soft border border-primary-50">
             <div class="p-4 border-b border-gray-50">
                 <span class="text-xs font-bold text-gray-800 uppercase tracking-widest">数据管理</span>
             </div>
