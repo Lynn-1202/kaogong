@@ -84,7 +84,7 @@
             display: none;
             flex: 1;
             overflow-y: auto;
-            padding-bottom: 30px; /* 减少底部填充，因为导航栏不再遮挡 */
+            padding-bottom: 80px; /* 增加底部填充，确保内容不被遮挡 */
         }
         .view.active {
             display: flex !important; /* 改为 flex 布局以更好地控制子元素 */
@@ -274,7 +274,7 @@
     </main>
 
     <!-- 视图：个人中心 -->
-    <main id="view-profile" class="view p-6 space-y-6">
+    <main id="view-profile" class="view p-6 space-y-6 pb-10">
         <!-- 用户信息与统计简报 -->
         <div class="bg-white rounded-3xl shadow-soft p-6 border border-primary-50 flex items-center gap-4">
             <div class="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center text-primary-600 text-2xl font-bold">
