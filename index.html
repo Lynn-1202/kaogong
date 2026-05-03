@@ -264,98 +264,65 @@
     </main>
 
     <!-- 视图：个人中心 -->
-    <main id="view-profile" class="view p-6">
-        <div id="profile-logged-out" class="space-y-8 py-10 pb-20">
-            <div class="text-center space-y-2">
-                <div class="w-20 h-20 bg-primary-50 text-primary-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-4">
-                    <i class="fas fa-user-shield"></i>
-                </div>
-                <h2 class="text-2xl font-bold text-gray-900">欢迎回来</h2>
-                <p class="text-sm text-gray-400">登录账号以同步您的学习进度</p>
+    <main id="view-profile" class="view p-6 space-y-6">
+        <!-- 用户信息与统计简报 -->
+        <div class="bg-white rounded-3xl shadow-soft p-6 border border-primary-50 flex items-center gap-4">
+            <div class="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center text-primary-600 text-2xl font-bold">
+                <i class="fas fa-user"></i>
             </div>
-            
-            <div class="space-y-4">
-                <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-gray-400 ml-4 uppercase tracking-wider">手机号 / 账号</label>
-                    <input type="text" placeholder="请输入您的账号" class="w-full bg-white border border-primary-50 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-primary-400 shadow-soft text-sm transition-all">
-                </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-gray-400 ml-4 uppercase tracking-wider">验证码 / 密码</label>
-                    <input type="password" placeholder="请输入密码" class="w-full bg-white border border-primary-50 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-primary-400 shadow-soft text-sm transition-all">
-                </div>
-                <button onclick="handleLogin()" class="w-full bg-primary-500 text-white py-4 rounded-2xl font-bold shadow-lg shadow-primary-200 active:scale-[0.98] transition-all mt-4">
-                    立即登录
-                </button>
-                <div class="flex justify-between px-2">
-                    <button class="text-[10px] text-gray-400 font-bold hover:text-primary-500">忘记密码？</button>
-                    <button class="text-[10px] text-primary-500 font-bold">新用户注册</button>
-                </div>
+            <div class="flex-1">
+                <h3 class="text-lg font-bold text-gray-900">本地学习账户</h3>
+                <p class="text-[10px] text-gray-400 font-medium italic">数据仅存储于当前设备</p>
             </div>
+        </div>
 
-            <div class="pt-8">
-                <div class="relative flex items-center justify-center mb-6">
-                    <div class="flex-grow border-t border-gray-100"></div>
-                    <span class="flex-shrink mx-4 text-[10px] text-gray-300 font-bold uppercase tracking-widest">快捷登录</span>
-                    <div class="flex-grow border-t border-gray-100"></div>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-white rounded-3xl p-5 border border-primary-50 shadow-soft">
+                <p class="text-[10px] text-gray-400 font-bold mb-1">连续打卡</p>
+                <p class="text-xl font-bold text-primary-600">1 <span class="text-xs">天</span></p>
+            </div>
+            <div class="bg-white rounded-3xl p-5 border border-primary-50 shadow-soft">
+                <p class="text-[10px] text-gray-400 font-bold mb-1">学习效率</p>
+                <p class="text-xl font-bold text-purple-600">极高</p>
+            </div>
+        </div>
+
+        <!-- 系统设置 -->
+        <div class="bg-white rounded-3xl shadow-soft border border-primary-50 overflow-hidden">
+            <div class="p-4 border-b border-gray-50">
+                <span class="text-xs font-bold text-gray-800 uppercase tracking-widest">数据管理</span>
+            </div>
+            <div class="divide-y divide-gray-50">
+                <div class="p-4 flex justify-between items-center active:bg-gray-50 transition-colors cursor-pointer" onclick="exportData()">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-download text-primary-400 text-xs"></i>
+                        <span class="text-xs text-gray-600">导出数据备份 (JSON)</span>
+                    </div>
+                    <i class="fas fa-chevron-right text-[8px] text-gray-300"></i>
                 </div>
-                <div class="flex justify-center gap-6">
-                    <button class="w-12 h-12 bg-white border border-gray-50 rounded-full flex items-center justify-center text-green-500 shadow-soft"><i class="fab fa-weixin text-xl"></i></button>
-                    <button class="w-12 h-12 bg-white border border-gray-50 rounded-full flex items-center justify-center text-blue-400 shadow-soft"><i class="fab fa-qq text-xl"></i></button>
+                <div class="p-4 flex justify-between items-center active:bg-gray-50 transition-colors cursor-pointer" onclick="importData()">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-upload text-primary-400 text-xs"></i>
+                        <span class="text-xs text-gray-600">导入数据备份</span>
+                    </div>
+                    <i class="fas fa-chevron-right text-[8px] text-gray-300"></i>
+                </div>
+                <div class="p-4 flex justify-between items-center active:bg-gray-50 transition-colors cursor-pointer" onclick="clearData()">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-trash-alt text-accent-error text-xs"></i>
+                        <span class="text-xs text-gray-600">清空本地缓存</span>
+                    </div>
+                    <i class="fas fa-chevron-right text-[8px] text-gray-300"></i>
                 </div>
             </div>
         </div>
 
-        <div id="profile-logged-in" class="hidden space-y-6">
-            <div class="bg-white rounded-3xl shadow-soft p-6 border border-primary-50 flex items-center gap-4">
-                <div class="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center text-primary-600 text-2xl font-bold">
-                    考
-                </div>
-                <div class="flex-1">
-                    <h3 class="text-lg font-bold text-gray-900">公考上岸人</h3>
-                    <p class="text-[10px] text-gray-400 font-medium">账号 ID: 88886666</p>
-                </div>
-                <button onclick="handleLogout()" class="text-[10px] font-bold text-gray-300 hover:text-accent-error">退出</button>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div class="bg-white rounded-3xl p-5 border border-primary-50 shadow-soft">
-                    <p class="text-[10px] text-gray-400 font-bold mb-1">连续打卡</p>
-                    <p class="text-xl font-bold text-primary-600">12 <span class="text-xs">天</span></p>
-                </div>
-                <div class="bg-white rounded-3xl p-5 border border-primary-50 shadow-soft">
-                    <p class="text-[10px] text-gray-400 font-bold mb-1">学习排名</p>
-                    <p class="text-xl font-bold text-purple-600">前 5%</p>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-3xl shadow-soft border border-primary-50 overflow-hidden">
-                <div class="p-4 border-b border-gray-50 flex justify-between items-center">
-                    <span class="text-xs font-bold text-gray-800">系统设置</span>
-                </div>
-                <div class="divide-y divide-gray-50">
-                    <div class="p-4 flex justify-between items-center active:bg-gray-50 transition-colors cursor-pointer">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-sync-alt text-gray-400 text-xs"></i>
-                            <span class="text-xs text-gray-600">云端同步数据</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-[8px] text-gray-300"></i>
-                    </div>
-                    <div class="p-4 flex justify-between items-center active:bg-gray-50 transition-colors cursor-pointer" onclick="clearData()">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-trash-alt text-accent-error text-xs"></i>
-                            <span class="text-xs text-gray-600">清空本地缓存</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-[8px] text-gray-300"></i>
-                    </div>
-                    <div class="p-4 flex justify-between items-center active:bg-gray-50 transition-colors cursor-pointer">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-info-circle text-gray-400 text-xs"></i>
-                            <span class="text-xs text-gray-600">关于我们</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-[8px] text-gray-300"></i>
-                    </div>
-                </div>
-            </div>
+        <!-- 帮助说明 -->
+        <div class="p-6 bg-primary-50/30 rounded-3xl border border-dashed border-primary-100">
+            <h4 class="text-[10px] font-bold text-primary-600 mb-2 uppercase tracking-widest">温馨提示</h4>
+            <p class="text-[11px] text-gray-500 leading-relaxed">
+                本应用采用本地存储技术，您的所有数据均保存在当前浏览器的缓存中。为了防止数据丢失，建议定期使用“导出”功能进行备份。
+            </p>
         </div>
     </main>
 
@@ -484,18 +451,60 @@
             }
         }
 
-        function handleLogin() {
+        function handleLogin(method = '账号') {
             // 模拟登录
             isLoggedIn = true;
             localStorage.setItem('kaogong_is_logged_in', 'true');
             updateLoginUI();
-            alert('登录成功！');
+            alert(method + '登录成功！');
         }
 
         function handleLogout() {
             isLoggedIn = false;
             localStorage.setItem('kaogong_is_logged_in', 'false');
             updateLoginUI();
+        }
+
+        // --- 数据备份功能 ---
+        function exportData() {
+            const dataStr = JSON.stringify(db);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'kaogong_backup_' + new Date().toISOString().slice(0,10) + '.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.readAsText(file,'UTF-8');
+                reader.onload = readerEvent => {
+                    try {
+                        const content = JSON.parse(readerEvent.target.result);
+                        if (Array.isArray(content)) {
+                            if (confirm('导入将覆盖当前所有积累，确定吗？')) {
+                                db = content;
+                                saveDb();
+                                alert('导入成功！');
+                                location.reload();
+                            }
+                        } else {
+                            alert('无效的备份文件');
+                        }
+                    } catch (err) {
+                        alert('读取文件出错');
+                    }
+                }
+            }
+            input.click();
         }
 
         function initMockData() {
