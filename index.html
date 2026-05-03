@@ -8,6 +8,16 @@
     <meta name="theme-color" content="#8b5cf6">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- 百度统计代码 -->
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?01c32c31bff27a89c4ebc0bf79569dcb";
+          var s = document.getElementsByTagName("script")[0]; 
+          s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -320,7 +330,7 @@
         <!-- 帮助说明 -->
         <div class="p-6 bg-primary-50/30 rounded-3xl border border-dashed border-primary-100">
             <h4 class="text-[10px] font-bold text-primary-600 mb-2 uppercase tracking-widest">温馨提示</h4>
-            <p class="text-[11px] text-gray-500 leading-relaxed">
+            <p class="text-[11px] text-gray-500 leading-relaxed mb-4">
                 本应用采用本地存储技术，您的所有数据均保存在当前浏览器的缓存中。为了防止数据丢失，建议定期使用“导出”功能进行备份。
             </p>
         </div>

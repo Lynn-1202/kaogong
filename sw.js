@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kaogong-v1';
+const CACHE_NAME = 'kaogong-v2'; // 更新版本号以触发强制刷新
 const ASSETS = [
   'index.html',
   'manifest.json',
