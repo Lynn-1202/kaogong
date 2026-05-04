@@ -1,8 +1,8 @@
 {
-  "name": "公考积累卡",
-  "short_name": "公考积累",
+  "name": "考公积累卡 v4",
+  "short_name": "考公积累v4",
   "description": "手机端公考常识与言语积累工具",
-  "start_url": "index.html",
+  "start_url": "kaogong-v4.html",
   "display": "standalone",
   "background_color": "#fcfaff",
   "theme_color": "#8b5cf6",

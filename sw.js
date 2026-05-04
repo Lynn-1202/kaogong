@@ -1,6 +1,6 @@
-const CACHE_NAME = 'kaogong-v2'; // 更新版本号以触发强制刷新
+const CACHE_NAME = 'kaogong-v4'; // 更新版本号以触发强制刷新
 const ASSETS = [
-  'index.html',
+  'kaogong-v4.html',
   'manifest.json',
   'https://cdn.tailwindcss.com',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'
