@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>考公积累卡</title>
+    <title>考公积累卡 v4</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8b5cf6">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -157,471 +157,548 @@
             </button>
         </header>
 
-    <!-- 视图：首页 -->
-    <main id="view-home" class="view active p-6 space-y-6">
-        <!-- 统计卡片 -->
-        <div class="bg-white rounded-3xl shadow-soft p-6 border border-primary-50">
-            <h2 class="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-6">今日概览</h2>
-            <div class="flex justify-between items-end">
-                <div class="space-y-1">
-                    <p class="text-3xl font-bold text-gray-900" id="stat-total">0</p>
-                    <p class="text-[10px] text-gray-400 font-medium">累计收录词条</p>
-                </div>
-                <div class="text-right space-y-4">
-                    <div class="flex items-center justify-end gap-3">
-                        <span class="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded-lg" id="stat-review">0</span>
-                        <span class="text-[10px] text-gray-400">待复习</span>
+        <!-- 视图：首页 -->
+        <main id="view-home" class="view active p-6 space-y-6">
+            <!-- 倒计时展示区域 -->
+            <div id="countdown-display" class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+                <!-- 动态填充倒计时卡片 -->
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="bg-white rounded-3xl shadow-soft p-6 border border-primary-50">
+                <div class="flex justify-between items-end">
+                    <div class="space-y-1">
+                        <p class="text-3xl font-bold text-gray-900" id="stat-total">0</p>
+                        <p class="text-[10px] text-gray-400 font-medium">累计收录词条</p>
                     </div>
-                    <div class="flex items-center justify-end gap-3">
-                        <span class="text-xs font-bold text-accent-success bg-green-50 px-2 py-1 rounded-lg" id="stat-mastered">0</span>
-                        <span class="text-[10px] text-gray-400">已掌握</span>
+                    <div class="text-right space-y-2">
+                        <div class="flex items-center justify-end gap-3 cursor-pointer active:opacity-60" onclick="switchTab('review')">
+                            <span class="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded-lg" id="stat-review">0</span>
+                            <span class="text-[10px] text-gray-400">待复习</span>
+                        </div>
+                        <div class="flex items-center justify-end gap-3 cursor-pointer active:opacity-60" onclick="jumpToLibraryMastered()">
+                            <span class="text-xs font-bold text-accent-success bg-green-50 px-2 py-1 rounded-lg" id="stat-mastered">0</span>
+                            <span class="text-[10px] text-gray-400">已掌握</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 快捷入口 -->
-        <div class="grid grid-cols-2 gap-4">
-            <div onclick="switchTab('add', 'word')" class="bg-white border border-primary-50 rounded-3xl p-5 flex flex-col items-start shadow-soft active:scale-[0.98] transition-all">
-                <div class="w-10 h-10 bg-primary-100 text-primary-600 rounded-2xl flex items-center justify-center text-lg mb-4">
-                    <i class="fas fa-feather-alt"></i>
-                </div>
-                <span class="font-bold text-gray-800">言语积累</span>
-                <span class="text-[10px] text-gray-400 mt-1">语感与逻辑沉淀</span>
-            </div>
-            <div onclick="switchTab('add', 'common')" class="bg-white border border-primary-50 rounded-3xl p-5 flex flex-col items-start shadow-soft active:scale-[0.98] transition-all">
-                <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center text-lg mb-4">
-                    <i class="fas fa-lightbulb"></i>
-                </div>
-                <span class="font-bold text-gray-800">常识积累</span>
-                <span class="text-[10px] text-gray-400 mt-1">百科全书式记忆</span>
-            </div>
-        </div>
-
-        <!-- 开始复习大按钮 -->
-        <button onclick="switchTab('review')" class="w-full bg-primary-500 hover:bg-primary-600 text-white rounded-2xl py-5 font-bold text-base shadow-lg shadow-primary-200 active:scale-[0.98] transition-all flex justify-center items-center gap-3">
-            <span class="bg-white/20 p-1.5 rounded-lg"><i class="fas fa-play text-xs"></i></span>
-            进入高效复习模式
-        </button>
-    </main>
-
-    <!-- 视图：录入 (新增) -->
-    <main id="view-add" class="view p-6">
-        <div class="bg-white rounded-3xl shadow-soft p-5 border border-primary-50 mb-6">
-            <!-- 类型切换 -->
-            <div class="flex bg-gray-50 p-1.5 rounded-2xl mb-6">
-                <button id="tab-type-word" onclick="setAddType('word')" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all shadow-sm bg-white text-primary-600">言语词语</button>
-                <button id="tab-type-common" onclick="setAddType('common')" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-gray-400">常识考点</button>
+            <!-- 考公计划看板 -->
+            <div id="plan-board" class="bg-white rounded-3xl shadow-soft p-6 border border-primary-50">
+                <!-- 动态渲染看板内容 -->
             </div>
 
-            <!-- 输入框 -->
-            <div class="space-y-4">
-                <div class="relative">
-                    <input type="text" id="input-term" placeholder="输入成语或常识词条..." class="w-full bg-gray-50 border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary-400 text-sm font-medium transition-all">
+            <!-- 快捷入口 -->
+            <div class="grid grid-cols-2 gap-4">
+                <div onclick="switchTab('add', 'word')" class="bg-white border border-primary-50 rounded-3xl p-5 flex flex-col items-start shadow-soft active:scale-[0.98] transition-all cursor-pointer">
+                    <div class="w-10 h-10 bg-primary-100 text-primary-600 rounded-2xl flex items-center justify-center text-lg mb-4">
+                        <i class="fas fa-feather-alt"></i>
+                    </div>
+                    <span class="font-bold text-gray-800">言语积累</span>
+                    <span class="text-[10px] text-gray-400 mt-1">语感与逻辑沉淀</span>
                 </div>
-                <button onclick="generateCard()" id="btn-generate" class="w-full bg-primary-500 text-white py-4 rounded-2xl font-bold text-sm shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                    <i class="fas fa-wand-magic-sparkles"></i> 智能解析词条
+                <div onclick="switchTab('add', 'common')" class="bg-white border border-primary-50 rounded-3xl p-5 flex flex-col items-start shadow-soft active:scale-[0.98] transition-all cursor-pointer">
+                    <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center text-lg mb-4">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <span class="font-bold text-gray-800">常识积累</span>
+                    <span class="text-[10px] text-gray-400 mt-1">百科全书式记忆</span>
+                </div>
+            </div>
+
+            <!-- 开始复习大按钮 -->
+            <button onclick="switchTab('review')" class="w-full bg-primary-500 hover:bg-primary-600 text-white rounded-2xl py-5 font-bold text-base shadow-lg shadow-primary-200 active:scale-[0.98] transition-all flex justify-center items-center gap-3">
+                <span class="bg-white/20 p-1.5 rounded-lg"><i class="fas fa-play text-xs"></i></span>
+                进入高效复习模式
+            </button>
+        </main>
+
+        <!-- 视图：录入 -->
+        <main id="view-add" class="view p-6">
+            <div class="bg-white rounded-3xl shadow-soft p-5 border border-primary-50 mb-6">
+                <!-- 类型切换 -->
+                <div class="flex bg-gray-50 p-1.5 rounded-2xl mb-6">
+                    <button id="tab-type-word" onclick="setAddType('word')" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all shadow-sm bg-white text-primary-600">言语词语</button>
+                    <button id="tab-type-common" onclick="setAddType('common')" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-gray-400">常识考点</button>
+                </div>
+
+                <!-- 输入框 -->
+                <div class="space-y-4">
+                    <div class="relative">
+                        <input type="text" id="input-term" placeholder="输入成语或常识词条..." class="w-full bg-gray-50 border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary-400 text-sm font-medium transition-all">
+                    </div>
+                    <button onclick="generateCard()" id="btn-generate" class="w-full bg-primary-500 text-white py-4 rounded-2xl font-bold text-sm shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-wand-magic-sparkles"></i> 智能解析词条
+                    </button>
+                </div>
+            </div>
+
+            <!-- 生成结果预览 -->
+            <div id="preview-area" class="hidden bg-white rounded-3xl shadow-soft p-6 border border-primary-50 relative animate-fadeIn">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h3 id="preview-title" class="text-xl font-bold text-gray-900 mb-1"></h3>
+                        <span id="preview-tag" class="text-[10px] font-bold text-primary-500 bg-primary-50 px-2 py-0.5 rounded-md"></span>
+                    </div>
+                    <div class="text-[10px] font-bold text-gray-300 uppercase">AI 解析结果</div>
+                </div>
+                
+                <div class="space-y-5 text-sm leading-relaxed" id="preview-content">
+                    <!-- 动态填充内容 -->
+                </div>
+
+                <button onclick="saveCard()" class="w-full mt-8 bg-accent-success text-white rounded-2xl py-4 font-bold shadow-md active:scale-[0.98] transition-all">
+                    确认为我的积累
                 </button>
             </div>
-        </div>
-
-        <!-- 生成结果预览 -->
-        <div id="preview-area" class="hidden bg-white rounded-3xl shadow-soft p-6 border border-primary-50 relative animate-fadeIn">
-            <div class="flex justify-between items-start mb-6">
-                <div>
-                    <h3 id="preview-title" class="text-xl font-bold text-gray-900 mb-1"></h3>
-                    <span id="preview-tag" class="text-[10px] font-bold text-primary-500 bg-primary-50 px-2 py-0.5 rounded-md"></span>
-                </div>
-                <div class="text-[10px] font-bold text-gray-300 uppercase">AI 解析结果</div>
-            </div>
             
-            <div class="space-y-5 text-sm leading-relaxed" id="preview-content">
-                <!-- 动态填充内容 -->
-            </div>
-
-            <button onclick="saveCard()" class="w-full mt-8 bg-accent-success text-white rounded-2xl py-4 font-bold shadow-md active:scale-[0.98] transition-all">
-                确认为我的积累
-            </button>
-        </div>
-        
-        <!-- 加载动画 -->
-        <div id="loading-area" class="hidden flex flex-col items-center justify-center py-16">
-            <div class="relative">
-                <div class="w-12 h-12 border-4 border-primary-100 rounded-full"></div>
-                <div class="w-12 h-12 border-4 border-primary-500 rounded-full border-t-transparent animate-spin absolute top-0"></div>
-            </div>
-            <p class="text-gray-400 text-xs mt-4 font-medium">正在检索考公大数据...</p>
-        </div>
-    </main>
-
-    <!-- 视图：词库 -->
-    <main id="view-library" class="view p-6">
-        <div class="relative mb-6">
-            <input type="text" id="search-input" onkeyup="renderLibrary()" placeholder="搜索已保存的词条..." class="w-full bg-white border border-primary-50 rounded-2xl pl-12 pr-5 py-4 focus:ring-2 focus:ring-primary-400 shadow-soft text-sm font-medium transition-all">
-            <i class="fas fa-search absolute left-5 top-5 text-gray-300"></i>
-        </div>
-
-        <div class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar" id="library-filters">
-            <button onclick="setLibraryFilter('all', this)" class="filter-btn active whitespace-nowrap px-5 py-2 rounded-xl bg-primary-500 text-white text-xs font-bold shadow-md transition-all">全部</button>
-            <button onclick="setLibraryFilter('word', this)" class="filter-btn whitespace-nowrap px-5 py-2 rounded-xl bg-white text-gray-400 border border-primary-50 text-xs font-bold transition-all">言语</button>
-            <button onclick="setLibraryFilter('common', this)" class="filter-btn whitespace-nowrap px-5 py-2 rounded-xl bg-white text-gray-400 border border-primary-50 text-xs font-bold transition-all">常识</button>
-        </div>
-
-        <div id="library-list" class="space-y-4">
-            <!-- 列表动态填充 -->
-        </div>
-    </main>
-
-    <!-- 视图：个人中心 -->
-    <main id="view-profile" class="view p-6 space-y-6">
-        <!-- 用户信息与统计简报 -->
-        <div class="bg-white rounded-3xl shadow-soft p-6 border border-primary-50 flex items-center gap-4">
-            <div class="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center text-primary-600 text-2xl font-bold">
-                <i class="fas fa-user"></i>
-            </div>
-            <div class="flex-1">
-                <h3 class="text-lg font-bold text-gray-900">本地学习账户</h3>
-                <p class="text-[10px] text-gray-400 font-medium italic">数据仅存储于当前设备</p>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-            <div class="bg-white rounded-3xl p-5 border border-primary-50 shadow-soft">
-                <p class="text-[10px] text-gray-400 font-bold mb-1">连续打卡</p>
-                <p class="text-xl font-bold text-primary-600">1 <span class="text-xs">天</span></p>
-            </div>
-            <div class="bg-white rounded-3xl p-5 border border-primary-50 shadow-soft">
-                <p class="text-[10px] text-gray-400 font-bold mb-1">学习效率</p>
-                <p class="text-xl font-bold text-purple-600">极高</p>
-            </div>
-        </div>
-
-        <!-- 系统设置 -->
-        <div class="bg-white rounded-3xl shadow-soft border border-primary-50">
-            <div class="p-4 border-b border-gray-50">
-                <span class="text-xs font-bold text-gray-800 uppercase tracking-widest">数据管理</span>
-            </div>
-            <div class="divide-y divide-gray-50">
-                <div class="p-4 flex justify-between items-center active:bg-gray-50 transition-colors cursor-pointer" onclick="exportData()">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-download text-primary-400 text-xs"></i>
-                        <span class="text-xs text-gray-600">导出数据备份 (JSON)</span>
-                    </div>
-                    <i class="fas fa-chevron-right text-[8px] text-gray-300"></i>
+            <!-- 加载动画 -->
+            <div id="loading-area" class="hidden flex flex-col items-center justify-center py-16">
+                <div class="relative">
+                    <div class="w-12 h-12 border-4 border-primary-100 rounded-full"></div>
+                    <div class="w-12 h-12 border-4 border-primary-500 rounded-full border-t-transparent animate-spin absolute top-0"></div>
                 </div>
-                <div class="p-4 flex justify-between items-center active:bg-gray-50 transition-colors cursor-pointer" onclick="importData()">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-upload text-primary-400 text-xs"></i>
-                        <span class="text-xs text-gray-600">导入数据备份</span>
-                    </div>
-                    <i class="fas fa-chevron-right text-[8px] text-gray-300"></i>
+                <p class="text-gray-400 text-xs mt-4 font-medium">正在检索考公大数据...</p>
+            </div>
+        </main>
+
+        <!-- 视图：词库 -->
+        <main id="view-library" class="view p-6" style="display: none;">
+            <div class="relative mb-6">
+                <input type="text" id="search-input" onkeyup="renderLibrary()" placeholder="搜索已保存的词条..." class="w-full bg-white border border-primary-50 rounded-2xl pl-12 pr-5 py-4 focus:ring-2 focus:ring-primary-400 shadow-soft text-sm font-medium transition-all">
+                <i class="fas fa-search absolute left-5 top-5 text-gray-300"></i>
+            </div>
+
+            <div class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar" id="library-filters">
+                <button onclick="setLibraryFilter('all', this)" class="filter-btn active whitespace-nowrap px-5 py-2 rounded-xl bg-primary-500 text-white text-xs font-bold shadow-md transition-all">全部</button>
+                <button onclick="setLibraryFilter('mastered', this)" id="filter-mastered" class="filter-btn whitespace-nowrap px-5 py-2 rounded-xl bg-white text-gray-400 border border-primary-50 text-xs font-bold transition-all">已掌握</button>
+                <button onclick="setLibraryFilter('word', this)" class="filter-btn whitespace-nowrap px-5 py-2 rounded-xl bg-white text-gray-400 border border-primary-50 text-xs font-bold transition-all">言语</button>
+                <button onclick="setLibraryFilter('common', this)" class="filter-btn whitespace-nowrap px-5 py-2 rounded-xl bg-white text-gray-400 border border-primary-50 text-xs font-bold transition-all">常识</button>
+            </div>
+
+            <div id="library-list" class="space-y-4">
+                <!-- 列表动态填充 -->
+            </div>
+        </main>
+
+        <!-- 视图：数据中心 -->
+        <main id="view-stats" class="view p-6 space-y-6">
+            <!-- 核心数据概览 -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white rounded-3xl p-5 border border-primary-50 shadow-soft cursor-pointer active:scale-95 transition-all" onclick="showCalendar()">
+                    <p class="text-[10px] text-gray-400 font-bold mb-1">累计打卡次数</p>
+                    <p class="text-2xl font-black text-primary-600" id="stats-total-checkins">0</p>
                 </div>
-                <div class="p-4 flex justify-between items-center active:bg-gray-50 transition-colors cursor-pointer" onclick="clearData()">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-trash-alt text-accent-error text-xs"></i>
-                        <span class="text-xs text-gray-600">清空本地缓存</span>
-                    </div>
-                    <i class="fas fa-chevron-right text-[8px] text-gray-300"></i>
+                <div class="bg-white rounded-3xl p-5 border border-primary-50 shadow-soft cursor-pointer active:scale-95 transition-all" onclick="jumpToLibraryMastered()">
+                    <p class="text-[10px] text-gray-400 font-bold mb-1">已掌握词条</p>
+                    <p class="text-2xl font-black text-accent-success" id="stats-mastered-words">0</p>
                 </div>
             </div>
-        </div>
 
-        <!-- 帮助说明 -->
-        <div class="p-6 bg-primary-50/30 rounded-3xl border border-dashed border-primary-100">
-            <h4 class="text-[10px] font-bold text-primary-600 mb-2 uppercase tracking-widest">温馨提示</h4>
-            <p class="text-[11px] text-gray-500 leading-relaxed mb-4">
-                本应用采用本地存储技术，您的所有数据均保存在当前浏览器的缓存中。为了防止数据丢失，建议定期使用“导出”功能进行备份。
-            </p>
-        </div>
-    </main>
+            <!-- 当前计划深度可视化 -->
+            <div class="bg-white rounded-3xl shadow-soft p-6 border border-primary-50">
+                <h3 class="text-xs font-bold text-gray-800 uppercase tracking-widest mb-6">当前计划进度详情</h3>
+                <div class="flex flex-col items-center justify-center py-4 relative">
+                    <!-- 圆形进度条 -->
+                    <svg class="w-32 h-32 transform -rotate-90">
+                        <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent" class="text-gray-50" />
+                        <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent" 
+                            stroke-dasharray="364.4" id="stats-circle-progress"
+                            class="text-primary-500 transition-all duration-1000" />
+                    </svg>
+                    <div class="absolute flex flex-col items-center">
+                        <span class="text-2xl font-black text-gray-900" id="stats-plan-percent">0%</span>
+                        <span class="text-[8px] text-gray-400 font-bold uppercase">完成度</span>
+                    </div>
+                </div>
+                <div class="mt-6 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-500 font-medium">计划名称</span>
+                        <span class="text-xs text-gray-900 font-bold" id="stats-plan-name">-</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-500 font-medium">已坚持天数</span>
+                        <span class="text-xs text-gray-900 font-bold" id="stats-plan-days">0 天</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-500 font-medium">剩余总天数</span>
+                        <span class="text-xs text-gray-900 font-bold" id="stats-plan-remain">0 天</span>
+                    </div>
+                </div>
+            </div>
 
-    <!-- 视图：复习 -->
-    <main id="view-review" class="view p-6">
-        <div id="review-empty" class="hidden h-full flex flex-col items-center justify-center text-center space-y-4 py-20">
-            <div class="w-20 h-20 bg-green-50 text-accent-success rounded-full flex items-center justify-center text-3xl">
-                <i class="fas fa-check"></i>
+            <!-- 历史记录 -->
+            <div class="space-y-4">
+                <h3 class="text-xs font-bold text-gray-800 uppercase tracking-widest ml-2">计划历史档案</h3>
+                <div id="stats-history-list" class="space-y-3">
+                    <!-- 动态填充历史记录 -->
+                </div>
             </div>
-            <div>
-                <p class="text-xl font-bold text-gray-800">任务已达成</p>
-                <p class="text-xs text-gray-400 mt-1">今日的知识点已经全部巩固完毕</p>
-            </div>
-            <button onclick="switchTab('home')" class="mt-4 px-8 py-3 bg-primary-500 text-white rounded-2xl font-bold text-sm shadow-md">回到首页</button>
-        </div>
+        </main>
 
-        <div id="review-card-container" class="hidden flex flex-col">
-            <div class="flex justify-between items-center mb-6 px-2">
-                <span class="text-[10px] font-bold text-primary-500 bg-primary-50 px-2 py-0.5 rounded-md">记忆挑战中</span>
-                <span class="text-[10px] font-bold text-gray-300" id="review-progress">1/5</span>
+        <!-- 视图：个人中心 -->
+        <main id="view-profile" class="view p-6 space-y-6">
+            <!-- 用户信息 -->
+            <div class="bg-white rounded-3xl shadow-soft p-6 border border-primary-50 flex items-center gap-4">
+                <div class="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center text-primary-600 text-2xl font-bold">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-bold text-gray-900">本地学习账户</h3>
+                    <p class="text-[10px] text-gray-400 font-medium italic">数据仅存储于当前设备</p>
+                </div>
             </div>
-            
-            <!-- 卡片容器 -->
-            <div id="flashcard" class="flashcard perspective-1000" onclick="flipCard()">
-                <div class="flashcard-inner">
-                    <!-- 正面 -->
-                    <div class="flashcard-front bg-white shadow-soft border border-primary-50 flex flex-col items-center justify-center p-8 text-center">
-                        <span id="fc-tag" class="text-[10px] font-bold text-primary-400 bg-primary-50/50 px-3 py-1 rounded-full mb-6"></span>
-                        <h2 id="fc-title" class="text-4xl font-bold text-gray-900 tracking-tight leading-tight"></h2>
-                        <div class="mt-12 text-gray-300 text-[10px] font-bold flex flex-col items-center gap-2">
-                            <div class="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center animate-bounce">
-                                <i class="fas fa-arrow-up text-[8px]"></i>
+
+            <!-- 考公倒计时设置 -->
+            <div class="bg-white rounded-3xl shadow-soft border border-primary-50 overflow-hidden">
+                <div class="p-4 border-b border-gray-50 flex justify-between items-center">
+                    <span class="text-xs font-bold text-gray-800 uppercase tracking-widest">倒计时设置</span>
+                    <button onclick="addCountdown()" class="text-primary-500 text-[10px] font-bold"><i class="fas fa-plus mr-1"></i>添加考试</button>
+                </div>
+                <div id="countdown-settings-list" class="divide-y divide-gray-50">
+                    <!-- 动态填充设置项 -->
+                </div>
+            </div>
+
+            <!-- 学习计划管理 (新版) -->
+            <div class="bg-white rounded-3xl shadow-soft border border-primary-50 overflow-hidden">
+                <div class="p-4 border-b border-gray-50 flex justify-between items-center">
+                    <span class="text-xs font-bold text-gray-800 uppercase tracking-widest">学习计划管理</span>
+                    <button onclick="openPlanModal()" class="text-primary-500 text-[10px] font-bold"><i class="fas fa-plus mr-1"></i>新增计划</button>
+                </div>
+                <div id="plan-list-settings" class="divide-y divide-gray-50">
+                    <!-- 动态填充计划列表 -->
+                </div>
+            </div>
+
+            <!-- AI 配置 -->
+            <div class="bg-white rounded-3xl shadow-soft border border-primary-50 overflow-hidden">
+                <div class="p-4 border-b border-gray-50">
+                    <span class="text-xs font-bold text-gray-800 uppercase tracking-widest">AI 智能解析配置</span>
+                </div>
+                <div class="p-5 space-y-4">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">API Key (DeepSeek / OpenAI)</label>
+                        <input type="password" id="ai-api-key" placeholder="在此输入你的 API Key" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary-400 text-xs transition-all">
+                    </div>
+                    <button onclick="saveAiConfig()" class="w-full bg-primary-500 text-white py-3 rounded-xl font-bold text-xs shadow-md active:scale-[0.98] transition-all">
+                        保存 AI 配置
+                    </button>
+                </div>
+            </div>
+
+            <!-- 数据管理 -->
+            <div class="bg-white rounded-3xl shadow-soft border border-primary-50">
+                <div class="p-4 border-b border-gray-50">
+                    <span class="text-xs font-bold text-gray-800 uppercase tracking-widest">数据管理</span>
+                </div>
+                <div class="divide-y divide-gray-50">
+                    <div class="p-4 flex justify-between items-center active:bg-gray-50 transition-colors cursor-pointer" onclick="exportData()">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-download text-primary-400 text-xs"></i>
+                            <span class="text-xs text-gray-600">导出数据备份</span>
+                        </div>
+                    </div>
+                    <div class="p-4 flex justify-between items-center active:bg-gray-50 transition-colors cursor-pointer" onclick="importData()">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-upload text-primary-400 text-xs"></i>
+                            <span class="text-xs text-gray-600">导入数据备份</span>
+                        </div>
+                    </div>
+                    <div class="p-4 flex justify-between items-center active:bg-gray-50 transition-colors cursor-pointer" onclick="clearData()">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-trash-alt text-accent-error text-xs"></i>
+                            <span class="text-xs text-gray-600">清空本地缓存</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 视图：复习 -->
+        <main id="view-review" class="view p-6 flex flex-col min-h-[calc(100vh-180px)]">
+            <!-- 初始选择界面 -->
+            <div id="review-selector" class="flex-1 flex flex-col justify-center space-y-6">
+                <div class="text-center space-y-2 mb-4">
+                    <h3 class="text-lg font-bold text-gray-900">选择复习板块</h3>
+                    <p class="text-xs text-gray-400">建议每日优先完成到期任务</p>
+                </div>
+                <div class="grid grid-cols-1 gap-4">
+                    <button onclick="prepareReview('word')" class="bg-white p-6 rounded-3xl border border-primary-50 shadow-soft flex items-center justify-between active:scale-95 transition-all group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-500 text-xl"><i class="fas fa-font"></i></div>
+                            <div class="text-left">
+                                <h4 class="font-bold text-gray-900">言语理解</h4>
+                                <p class="text-[10px] text-gray-400" id="review-count-word">待复习: 0</p>
                             </div>
-                            点击揭晓解析
                         </div>
-                    </div>
-
-                    <!-- 背面 -->
-                    <div class="flashcard-back bg-white shadow-soft border-t-8 border-primary-500 p-8 overflow-y-auto flex flex-col">
-                        <h2 id="fc-back-title" class="text-2xl font-bold text-gray-900 mb-6 border-b border-gray-50 pb-4"></h2>
-                        <div id="fc-back-content" class="flex-1 space-y-6 text-sm leading-relaxed text-gray-700">
-                            <!-- 动态填充 -->
+                        <i class="fas fa-chevron-right text-gray-200"></i>
+                    </button>
+                    <button onclick="prepareReview('common')" class="bg-white p-6 rounded-3xl border border-primary-50 shadow-soft flex items-center justify-between active:scale-95 transition-all group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-500 text-xl"><i class="fas fa-lightbulb"></i></div>
+                            <div class="text-left">
+                                <h4 class="font-bold text-gray-900">常识判断</h4>
+                                <p class="text-[10px] text-gray-400" id="review-count-common">待复习: 0</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-200"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- 复习中 -->
+            <div id="review-active" class="hidden flex-1 flex flex-col">
+                <div class="flex justify-between items-center mb-6 px-2">
+                    <button onclick="exitReview()" class="text-gray-400 text-xs font-bold flex items-center gap-1"><i class="fas fa-times"></i> 退出</button>
+                    <span class="text-[10px] font-bold text-gray-300" id="review-progress">1/5</span>
+                </div>
+                <div id="flashcard" class="flashcard perspective-1000" onclick="flipCard()">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front bg-white shadow-soft border border-primary-50 flex flex-col items-center justify-center p-8 text-center">
+                            <span id="fc-tag" class="text-[10px] font-bold text-primary-400 bg-primary-50/50 px-3 py-1 rounded-full mb-6"></span>
+                            <h2 id="fc-title" class="text-4xl font-bold text-gray-900 tracking-tight leading-tight"></h2>
+                            <div class="mt-12 text-gray-300 text-[10px] font-bold flex flex-col items-center gap-2">
+                                <div class="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center animate-bounce"><i class="fas fa-arrow-up text-[8px]"></i></div>
+                                点击揭晓解析
+                            </div>
+                        </div>
+                        <div class="flashcard-back bg-white shadow-soft border-t-8 border-primary-500 p-8 overflow-y-auto flex flex-col">
+                            <h2 id="fc-back-title" class="text-2xl font-bold text-gray-900 mb-6 border-b border-gray-50 pb-4"></h2>
+                            <div id="fc-back-content" class="flex-1 space-y-6 text-sm leading-relaxed text-gray-700"></div>
                         </div>
                     </div>
                 </div>
+                <div id="review-actions" class="grid grid-cols-3 gap-3 mt-10 opacity-0 pointer-events-none transition-all translate-y-4">
+                    <button onclick="submitReview(0)" class="bg-red-50 text-accent-error py-4 rounded-2xl font-bold text-xs active:scale-[0.95] transition-all">陌生</button>
+                    <button onclick="submitReview(1)" class="bg-orange-50 text-orange-500 py-4 rounded-2xl font-bold text-xs active:scale-[0.95] transition-all">模糊</button>
+                    <button onclick="submitReview(2)" class="bg-green-50 text-accent-success py-4 rounded-2xl font-bold text-xs active:scale-[0.95] transition-all">掌握</button>
+                </div>
             </div>
+            <!-- 复习空状态 -->
+            <div id="review-empty" class="hidden flex-1 flex flex-col items-center justify-center text-center space-y-4 py-20">
+                <div class="w-20 h-20 bg-green-50 text-accent-success rounded-full flex items-center justify-center text-3xl"><i class="fas fa-check"></i></div>
+                <div><p class="text-xl font-bold text-gray-800">任务已达成</p></div>
+                <button onclick="exitReview()" class="mt-4 px-8 py-3 bg-primary-500 text-white rounded-2xl font-bold text-sm shadow-md">返回板块选择</button>
+            </div>
+        </main>
 
-            <!-- 操作按钮 -->
-            <div id="review-actions" class="grid grid-cols-3 gap-3 mt-10 opacity-0 pointer-events-none transition-all translate-y-4">
-                <button onclick="submitReview(0)" class="bg-red-50 text-accent-error py-4 rounded-2xl font-bold text-xs active:scale-[0.95] transition-all">陌生</button>
-                <button onclick="submitReview(1)" class="bg-orange-50 text-orange-500 py-4 rounded-2xl font-bold text-xs active:scale-[0.95] transition-all">模糊</button>
-                <button onclick="submitReview(2)" class="bg-green-50 text-accent-success py-4 rounded-2xl font-bold text-xs active:scale-[0.95] transition-all">掌握</button>
+        <!-- 底部导航栏 -->
+        <nav class="glass-effect relative w-full border-t border-primary-50 flex justify-around items-center px-4 pb-8 pt-2 z-50 rounded-t-3xl shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.05)]">
+            <a href="javascript:void(0)" onclick="switchTab('home')" class="nav-item active text-gray-300 flex flex-col items-center p-2 transition-all" id="nav-home">
+                <i class="fas fa-compass text-xl mb-1"></i><span class="text-[10px] font-bold">探索</span>
+            </a>
+            <a href="javascript:void(0)" onclick="switchTab('add')" class="nav-item text-gray-300 flex flex-col items-center p-2 transition-all" id="nav-add">
+                <i class="fas fa-plus-square text-xl mb-1"></i><span class="text-[10px] font-bold">积累</span>
+            </a>
+            <a href="javascript:void(0)" onclick="switchTab('library')" class="nav-item text-gray-300 flex flex-col items-center p-2 transition-all" id="nav-library">
+                <i class="fas fa-archive text-xl mb-1"></i><span class="text-[10px] font-bold">词库</span>
+            </a>
+            <a href="javascript:void(0)" onclick="switchTab('stats')" class="nav-item text-gray-300 flex flex-col items-center p-2 transition-all" id="nav-stats">
+                <i class="fas fa-chart-bar text-xl mb-1"></i><span class="text-[10px] font-bold">数据</span>
+            </a>
+            <a href="javascript:void(0)" onclick="switchTab('review')" class="nav-item text-gray-300 flex flex-col items-center p-2 transition-all" id="nav-review">
+                <div class="relative">
+                    <i class="fas fa-fire-alt text-xl mb-1"></i>
+                    <span id="nav-badge" class="absolute -top-1 -right-2 bg-accent-error text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold hidden">0</span>
+                </div>
+                <span class="text-[10px] font-bold">复习</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- 弹窗 -->
+    <!-- 学习计划编辑弹窗 -->
+    <div id="modal-plan" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm transition-all">
+        <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-6 scale-up max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center">
+                <h3 id="modal-plan-title" class="text-lg font-bold text-gray-900">编辑计划</h3>
+                <button onclick="closePlanModal()" class="text-gray-300 hover:text-gray-500"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">计划名称</label>
+                    <input type="text" id="modal-plan-name" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">描述</label>
+                    <input type="text" id="modal-plan-desc" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">周期 (天)</label>
+                        <input type="number" id="modal-plan-total" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">已完成</label>
+                        <input type="number" id="modal-plan-completed" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">开始日期</label>
+                    <input type="date" id="modal-plan-startdate" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm">
+                </div>
+            </div>
+            <button onclick="savePlanFromModal()" class="w-full bg-primary-500 text-white py-4 rounded-2xl font-bold">保存计划</button>
+        </div>
+    </div>
+    
+    <!-- 倒计时编辑弹窗 -->
+    <div id="modal-countdown" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm transition-all">
+        <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 space-y-6 scale-up">
+            <div class="flex justify-between items-center">
+                <h3 id="modal-countdown-title" class="text-lg font-bold text-gray-900">编辑倒计时</h3>
+                <button onclick="closeCountdownModal()" class="text-gray-300 hover:text-gray-500"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">名称</label>
+                    <input type="text" id="modal-input-name" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">日期</label>
+                    <input type="date" id="modal-input-date" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm">
+                </div>
+            </div>
+            <button onclick="saveCountdownFromModal()" class="w-full bg-primary-500 text-white py-4 rounded-2xl font-bold">确认保存</button>
+        </div>
+    </div>
+
+    <!-- 打卡日历弹窗 -->
+    <div id="modal-calendar" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm transition-all">
+        <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden flex flex-col scale-up">
+            <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-primary-500 text-white">
+                <button onclick="changeCalendarMonth(-1)" class="p-2 hover:bg-white/20 rounded-xl transition-all"><i class="fas fa-chevron-left"></i></button>
+                <h3 id="calendar-month-title" class="font-bold text-sm tracking-widest"></h3>
+                <button onclick="changeCalendarMonth(1)" class="p-2 hover:bg-white/20 rounded-xl transition-all"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-7 gap-1 mb-4">
+                    <div class="text-center text-[10px] font-black text-gray-300">日</div>
+                    <div class="text-center text-[10px] font-black text-gray-300">一</div>
+                    <div class="text-center text-[10px] font-black text-gray-300">二</div>
+                    <div class="text-center text-[10px] font-black text-gray-300">三</div>
+                    <div class="text-center text-[10px] font-black text-gray-300">四</div>
+                    <div class="text-center text-[10px] font-black text-gray-300">五</div>
+                    <div class="text-center text-[10px] font-black text-gray-300">六</div>
+                </div>
+                <div id="calendar-grid" class="grid grid-cols-7 gap-2"></div>
+                <div id="calendar-footer-stats" class="mt-6 text-center text-[10px] text-gray-400 font-bold uppercase tracking-wider"></div>
+            </div>
+            <div class="p-6 bg-gray-50/50 border-t border-gray-50"><button onclick="closeCalendar()" class="w-full bg-white py-4 rounded-2xl font-bold text-xs">返回</button></div>
+        </div>
+    </div>
+
+    <!-- 词条详情弹窗 -->
+    <div id="modal-card-detail" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm transition-all">
+        <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] scale-up">
+            <div class="p-6 border-b border-gray-50 flex justify-between items-center">
+                <div><h3 id="detail-title" class="text-xl font-bold text-gray-900"></h3><span id="detail-tag" class="text-[10px] font-bold text-primary-500 bg-primary-50 px-2 py-0.5 rounded-md mt-1 inline-block"></span></div>
+                <button onclick="closeCardDetail()" class="text-gray-300 hover:text-gray-500 p-2"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6 space-y-6" id="detail-content"></div>
+            <div class="p-6 bg-gray-50/50 border-t border-gray-50 space-y-3">
+                <button id="btn-forget-card" onclick="forgetCard()" class="hidden w-full bg-orange-50 text-orange-500 py-4 rounded-2xl font-bold text-xs">记不清了，重新加入复习</button>
+                <button onclick="closeCardDetail()" class="w-full bg-white border border-gray-200 text-gray-500 py-4 rounded-2xl font-bold text-xs">已阅</button>
             </div>
         </div>
-    </main>
-
-    <!-- 底部导航栏 -->
-    <nav class="glass-effect relative w-full border-t border-primary-50 flex justify-around items-center px-4 pb-8 pt-2 z-50 rounded-t-3xl shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.05)]">
-        <a href="javascript:void(0)" onclick="switchTab('home')" class="nav-item active text-gray-300 flex flex-col items-center p-2 transition-all" id="nav-home">
-            <i class="fas fa-compass text-xl mb-1"></i>
-            <span class="text-[10px] font-bold">探索</span>
-        </a>
-        <a href="javascript:void(0)" onclick="switchTab('add')" class="nav-item text-gray-300 flex flex-col items-center p-2 transition-all" id="nav-add">
-            <i class="fas fa-plus-square text-xl mb-1"></i>
-            <span class="text-[10px] font-bold">积累</span>
-        </a>
-        <a href="javascript:void(0)" onclick="switchTab('library')" class="nav-item text-gray-300 flex flex-col items-center p-2 transition-all" id="nav-library">
-            <i class="fas fa-archive text-xl mb-1"></i>
-            <span class="text-[10px] font-bold">词库</span>
-        </a>
-        <a href="javascript:void(0)" onclick="switchTab('review')" class="nav-item text-gray-300 flex flex-col items-center p-2 transition-all" id="nav-review">
-            <div class="relative">
-                <i class="fas fa-fire-alt text-xl mb-1"></i>
-                <span id="nav-badge" class="absolute -top-1 -right-2 bg-accent-error text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold hidden">0</span>
-            </div>
-            <span class="text-[10px] font-bold">复习</span>
-        </a>
-    </nav>
     </div>
 
     <script>
-        // --- 状态与数据管理 ---
+        // --- 核心数据 ---
         let db = JSON.parse(localStorage.getItem('kaogong_db')) || [];
-        let isLoggedIn = localStorage.getItem('kaogong_is_logged_in') === 'true';
+        let countdowns = JSON.parse(localStorage.getItem('kaogong_countdowns')) || [
+            { id: 1, name: '国考笔试', date: '2026-11-25' },
+            { id: 2, name: '江苏省考', date: '2026-12-08' }
+        ];
+        
+        // 多计划数据结构
+        let studyPlans = JSON.parse(localStorage.getItem('kaogong_plans')) || [];
+        const oldPlan = JSON.parse(localStorage.getItem('kaogong_plan'));
+        if (studyPlans.length === 0 && oldPlan) {
+            studyPlans.push({
+                id: Date.now(), name: oldPlan.name || '默认计划', desc: oldPlan.desc || '',
+                totalDays: oldPlan.totalDays || 45, completedDays: oldPlan.completedDays || 0,
+                startDate: oldPlan.startDate || new Date().toISOString().slice(0, 10),
+                lastCheckIn: oldPlan.lastCheckIn || null, status: 'active'
+            });
+        }
+        
+        let globalStats = JSON.parse(localStorage.getItem('kaogong_global_stats')) || {
+            totalCheckIns: oldPlan ? (oldPlan.totalCheckIns || 0) : 0,
+            checkInHistory: oldPlan ? (oldPlan.checkInHistory || []) : [],
+            history: oldPlan ? (oldPlan.history || []) : []
+        };
+
         let currentAddType = 'word';
         let currentGeneratedCard = null;
         let currentFilter = 'all';
-        
-        // 复习状态
+        let curCardId = null;
         let reviewQueue = [];
         let currentReviewIndex = 0;
+        let currentReviewType = null;
 
         // --- 初始化 ---
         window.onload = () => {
             updateStats();
-            updateLoginUI();
-            // 如果为了演示体验，初始化一些假数据
-            if(db.length === 0) {
-                initMockData();
-            }
-            // 确保初始视图同步
+            loadAiConfig();
+            renderCountdowns();
+            renderPlan();
+            renderCountdownSettings();
+            if(db.length === 0) initMockData();
             switchTab('home');
+        };
 
-            // 注册 Service Worker (PWA)
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('sw.js').then(reg => {
-                        console.log('SW registered');
-                    }).catch(err => {
-                        console.log('SW registration failed', err);
-                    });
-                });
-            }
-        }
-
-        function updateLoginUI() {
-            const loggedOutEl = document.getElementById('profile-logged-out');
-            const loggedInEl = document.getElementById('profile-logged-in');
-            
-            if (isLoggedIn) {
-                if (loggedOutEl) loggedOutEl.classList.add('hidden');
-                if (loggedInEl) loggedInEl.classList.remove('hidden');
-            } else {
-                if (loggedOutEl) loggedOutEl.classList.remove('hidden');
-                if (loggedInEl) loggedInEl.classList.add('hidden');
-            }
-        }
-
-        function handleLogin(method = '账号') {
-            // 模拟登录
-            isLoggedIn = true;
-            localStorage.setItem('kaogong_is_logged_in', 'true');
-            updateLoginUI();
-            alert(method + '登录成功！');
-        }
-
-        function handleLogout() {
-            isLoggedIn = false;
-            localStorage.setItem('kaogong_is_logged_in', 'false');
-            updateLoginUI();
-        }
-
-        // --- 数据备份功能 ---
-        function exportData() {
-            const dataStr = JSON.stringify(db);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = 'kaogong_backup_' + new Date().toISOString().slice(0,10) + '.json';
-            
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
-        }
-
-        function importData() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            input.onchange = e => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.readAsText(file,'UTF-8');
-                reader.onload = readerEvent => {
-                    try {
-                        const content = JSON.parse(readerEvent.target.result);
-                        if (Array.isArray(content)) {
-                            if (confirm('导入将覆盖当前所有积累，确定吗？')) {
-                                db = content;
-                                saveDb();
-                                alert('导入成功！');
-                                location.reload();
-                            }
-                        } else {
-                            alert('无效的备份文件');
-                        }
-                    } catch (err) {
-                        alert('读取文件出错');
-                    }
+        function getActivePlan() {
+            const today = new Date().toISOString().slice(0, 10);
+            let active = studyPlans.find(p => p.status === 'active');
+            if (active) return active;
+            const sorted = [...studyPlans].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+            for (let plan of sorted) {
+                if (plan.status !== 'completed' && plan.completedDays < plan.totalDays && new Date(plan.startDate) <= new Date(today)) {
+                    plan.status = 'active';
+                    savePlans();
+                    return plan;
                 }
             }
-            input.click();
+            return null;
         }
 
-        function initMockData() {
-            db = [
-                {
-                    id: 1, type: "word", title: "南辕北辙", tag: "言语理解 · 成语",
-                    content: {
-                        summary: "行动和目的相反，越做越偏。",
-                        usage: "多用于批评政策执行、工作方法、治理举措与初衷不一致。",
-                        example: "若只追求短期数据增长而忽视长效治理，往往会使改革目标与执行路径南辕北辙。",
-                        error: "易与“背道而驰”混淆，后者更强调方向完全相反；南辕北辙强调目的与行动错位。",
-                        tip: "想去南方却往北走。"
-                    },
-                    level: 0, nextReview: Date.now() - 1000 // 需要复习
-                },
-                {
-                    id: 2, type: "common", title: "行政处罚", tag: "常识判断 · 法律",
-                    content: {
-                        summary: "行政机关依法对违反行政管理秩序的公民、法人或其他组织作出的惩戒。",
-                        points: "种类包括：警告、通报批评；罚款、没收违法所得；暂扣许可证件、降低资质等级；限制开展生产经营活动；行政拘留等。",
-                        error: "行政处分针对公职人员（内部）；行政处罚针对违法相对人（外部）。",
-                        example: "常见考法：“下列属于行政处罚的是？” -> 答案选“某局对企业罚款5万元”。",
-                        tip: "对外罚老百姓/企业的叫处罚，对内罚干部的叫处分。"
-                    },
-                    level: 1, nextReview: Date.now() - 1000 // 需要复习
-                }
-            ];
-            saveDb();
-            updateStats();
+        function savePlans() {
+            localStorage.setItem('kaogong_plans', JSON.stringify(studyPlans));
+            localStorage.setItem('kaogong_global_stats', JSON.stringify(globalStats));
         }
 
-        function saveDb() {
-            localStorage.setItem('kaogong_db', JSON.stringify(db));
-            updateStats();
-        }
-
-        function clearData() {
-            if(confirm('确定要清空所有积累的数据吗？不可恢复！')) {
-                db = [];
-                saveDb();
-                alert('已清空');
-                if(document.getElementById('view-library').classList.contains('active')) renderLibrary();
-            }
-        }
-
-        // --- 视图路由 ---
         function switchTab(tabId, subType = null) {
-            // 隐藏所有视图
-            document.querySelectorAll('.view').forEach(el => {
-                el.classList.remove('active');
-                el.style.display = 'none'; // 强制隐藏
-            });
-            // 移除导航高亮
-            document.querySelectorAll('.nav-item').forEach(el => {
-                el.classList.remove('active', 'text-primary-600');
-                el.classList.add('text-gray-300');
-            });
-            
-            // 激活当前
+            document.querySelectorAll('.view').forEach(el => { el.classList.remove('active'); el.style.display = 'none'; });
+            document.querySelectorAll('.nav-item').forEach(el => { el.classList.remove('active', 'text-primary-600'); el.classList.add('text-gray-300'); });
             const activeView = document.getElementById('view-' + tabId);
-            if (activeView) {
-                activeView.classList.add('active');
-                activeView.style.display = 'block'; // 强制显示
-            }
-            
+            if (activeView) { activeView.classList.add('active'); activeView.style.display = 'block'; }
             const activeNav = document.getElementById('nav-' + tabId);
-            if (activeNav) {
-                activeNav.classList.add('active', 'text-primary-600');
-                activeNav.classList.remove('text-gray-300');
-            }
+            if (activeNav) { activeNav.classList.add('active', 'text-primary-600'); activeNav.classList.remove('text-gray-300'); }
+            const titles = { 'home': '公考积累', 'add': '新增卡片', 'library': '我的词库', 'stats': '数据中心', 'review': '复习', 'profile': '个人中心' };
+            if (document.getElementById('header-title')) document.getElementById('header-title').innerText = titles[tabId];
+            
+            // 每次切换标签页时更新统计
+            updateStats();
 
-            // 处理顶部个人按钮高亮
-            const btnProfile = document.getElementById('btn-profile');
-            if (tabId === 'profile') {
-                btnProfile.classList.add('text-primary-500');
-                btnProfile.classList.remove('text-gray-400');
-            } else {
-                btnProfile.classList.add('text-gray-400');
-                btnProfile.classList.remove('text-primary-500');
-            }
-
-            // 动态标题
-            const titles = { 'home': '公考积累', 'add': '新增卡片', 'library': '我的词库', 'review': '卡片复习', 'profile': '个人中心' };
-            if (document.getElementById('header-title')) {
-                document.getElementById('header-title').innerText = titles[tabId];
-            }
-
-            if (tabId === 'add') {
-                if(subType) setAddType(subType);
-            } else if (tabId === 'library') {
-                renderLibrary();
-            } else if (tabId === 'review') {
-                startReview();
-            } else if (tabId === 'home') {
-                updateStats();
-            }
+            if (tabId === 'add') { resetAddView(); if(subType) setAddType(subType); } 
+            else if (tabId === 'library') renderLibrary();
+            else if (tabId === 'stats') renderStats();
+            else if (tabId === 'review') exitReview();
+            else if (tabId === 'home') { renderCountdowns(); renderPlan(); }
+            else if (tabId === 'profile') { renderCountdownSettings(); renderPlan(); renderPlanList(); }
         }
 
+        function refreshPlanUI() { renderPlan(); renderStats(); updateStats(); }
+        function saveDb() { localStorage.setItem('kaogong_db', JSON.stringify(db)); updateStats(); refreshPlanUI(); }
         function updateStats() {
             const now = Date.now();
-            const total = db.length;
-            const reviewCount = db.filter(item => item.nextReview <= now).length;
-            const mastered = db.filter(item => item.level >= 3).length;
-
-            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-total').innerText = db.length;
+            const reviewCount = db.filter(i => i.nextReview <= now).length;
             document.getElementById('stat-review').innerText = reviewCount;
-            document.getElementById('stat-mastered').innerText = mastered;
-
+            document.getElementById('stat-mastered').innerText = db.filter(i => i.level >= 3).length;
+            
             const badge = document.getElementById('nav-badge');
             if (badge) {
                 if (reviewCount > 0) {
@@ -631,315 +708,380 @@
                     badge.classList.add('hidden');
                 }
             }
+            updateReviewCounts();
         }
 
-        // --- 录入模块 ---
-        function setAddType(type) {
-            currentAddType = type;
-            const btnWord = document.getElementById('tab-type-word');
-            const btnCommon = document.getElementById('tab-type-common');
+        function renderPlanList() {
+            const list = document.getElementById('plan-list-settings');
+            if (!list) return;
+            // 过滤掉已完成的计划
+            const activeAndPending = studyPlans.filter(p => p.status !== 'completed' && p.completedDays < p.totalDays);
             
-            if (type === 'word') {
-                btnWord.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all shadow-sm bg-white text-primary-600";
-                btnCommon.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-gray-400";
+            if (activeAndPending.length === 0) { 
+                list.innerHTML = '<div class="p-8 text-center text-gray-300 text-xs">暂无进行中或待开始的计划</div>'; 
+                return; 
+            }
+            const sorted = [...activeAndPending].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+            list.innerHTML = sorted.map(plan => {
+                let sColor = 'text-gray-400', sText = '等待中';
+                if (plan.status === 'active') { sColor = 'text-primary-500'; sText = '进行中'; }
+                else if (plan.status === 'completed' || plan.completedDays >= plan.totalDays) { sColor = 'text-accent-success'; sText = '已完成'; }
+                return `<div class="p-4 flex justify-between items-center bg-white"><div class="flex flex-col gap-1"><div class="flex items-center gap-2"><span class="text-xs font-bold text-gray-700">${plan.name}</span><span class="text-[8px] font-bold ${sColor} bg-opacity-10 px-1.5 py-0.5 rounded border border-current">${sText}</span></div><span class="text-[10px] text-gray-400">${plan.startDate} · ${plan.totalDays}天</span></div><div class="flex gap-3">${plan.status !== 'active' && plan.status !== 'completed' ? `<button onclick="activatePlan(${plan.id})" class="text-primary-500 text-[10px] font-bold">激活</button>` : ''}<button onclick="openPlanModal(${plan.id})" class="text-primary-500 text-[10px] font-bold">编辑</button><button onclick="removePlan(${plan.id})" class="text-accent-error text-[10px] font-bold">删除</button></div></div>`;
+            }).join('');
+        }
+
+        let editPlanId = null;
+        function openPlanModal(id = null) {
+            editPlanId = id;
+            const modal = document.getElementById('modal-plan');
+            if (id) {
+                const p = studyPlans.find(x => x.id === id);
+                document.getElementById('modal-plan-name').value = p.name;
+                document.getElementById('modal-plan-desc').value = p.desc;
+                document.getElementById('modal-plan-total').value = p.totalDays;
+                document.getElementById('modal-plan-completed').value = p.completedDays;
+                document.getElementById('modal-plan-startdate').value = p.startDate;
             } else {
-                btnCommon.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all shadow-sm bg-white text-primary-600";
-                btnWord.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-gray-400";
+                document.getElementById('modal-plan-name').value = '';
+                document.getElementById('modal-plan-desc').value = '';
+                document.getElementById('modal-plan-total').value = 45;
+                document.getElementById('modal-plan-completed').value = 0;
+                document.getElementById('modal-plan-startdate').value = new Date().toISOString().slice(0, 10);
             }
-            
-            // 隐藏之前的预览
-            const previewArea = document.getElementById('preview-area');
-            if (previewArea) previewArea.classList.add('hidden');
+            modal.classList.remove('hidden');
         }
-
-        async function generateCard() {
-            const term = document.getElementById('input-term').value.trim();
-            if (!term) return alert('请输入内容');
-
-            // 检查重复
-            if(db.find(i => i.title === term && i.type === currentAddType)) {
-                return alert('该词条已在词库中！');
-            }
-
-            // 显示加载
-            document.getElementById('btn-generate').disabled = true;
-            document.getElementById('btn-generate').innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            document.getElementById('preview-area').classList.add('hidden');
-            document.getElementById('loading-area').classList.remove('hidden');
-
-            // 模拟 AI 请求延迟 (真实场景替换为 fetch 调用大模型 API)
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            // 模拟 AI 返回结果
-            let aiResult = getMockAiResponse(term, currentAddType);
-            currentGeneratedCard = aiResult;
-
-            // 渲染预览
-            renderPreview(aiResult);
-
-            // 恢复 UI
-            document.getElementById('loading-area').classList.add('hidden');
-            document.getElementById('preview-area').classList.remove('hidden');
-            document.getElementById('btn-generate').disabled = false;
-            document.getElementById('btn-generate').innerHTML = '<i class="fas fa-magic"></i> AI 生成';
-        }
-
-        function renderPreview(data) {
-            document.getElementById('preview-title').innerText = data.title;
-            document.getElementById('preview-tag').innerText = data.tag;
-            
-            let html = '';
-            if (data.type === 'word') {
-                html = `
-                    <div class="space-y-1"><span class="text-[10px] font-bold text-primary-400 uppercase tracking-wider">释义</span><p class="text-gray-700">${data.content.summary}</p></div>
-                    <div class="space-y-1"><span class="text-[10px] font-bold text-primary-400 uppercase tracking-wider">语境</span><p class="text-gray-700">${data.content.usage}</p></div>
-                    <div class="p-4 bg-primary-50 rounded-2xl border border-primary-100/50"><span class="text-[10px] font-bold text-primary-500 uppercase mb-2 block">真题例句</span><p class="text-primary-900 font-medium italic">“${data.content.example}”</p></div>
-                    <div class="flex gap-4">
-                        <div class="flex-1"><span class="text-[10px] font-bold text-accent-error uppercase block mb-1">易错</span><p class="text-xs text-gray-500">${data.content.error}</p></div>
-                        <div class="flex-1"><span class="text-[10px] font-bold text-accent-success uppercase block mb-1">记忆</span><p class="text-xs text-gray-500">${data.content.tip}</p></div>
-                    </div>
-                `;
+        function closePlanModal() { document.getElementById('modal-plan').classList.add('hidden'); }
+        function savePlanFromModal() {
+            const name = document.getElementById('modal-plan-name').value.trim();
+            const desc = document.getElementById('modal-plan-desc').value.trim();
+            const total = parseInt(document.getElementById('modal-plan-total').value) || 1;
+            const completed = parseInt(document.getElementById('modal-plan-completed').value) || 0;
+            const startDate = document.getElementById('modal-plan-startdate').value;
+            if (!name || !startDate) return alert('必填');
+            if (editPlanId) {
+                const idx = studyPlans.findIndex(p => p.id === editPlanId);
+                studyPlans[idx] = { ...studyPlans[idx], name, desc, totalDays: total, completedDays: completed, startDate };
             } else {
-                html = `
-                    <div class="space-y-1"><span class="text-[10px] font-bold text-primary-400 uppercase tracking-wider">概念</span><p class="text-gray-700">${data.content.summary}</p></div>
-                    <div class="space-y-1"><span class="text-[10px] font-bold text-primary-400 uppercase tracking-wider">核心考点</span><p class="text-gray-700">${data.content.points}</p></div>
-                    <div class="p-4 bg-primary-50 rounded-2xl border border-primary-100/50"><span class="text-[10px] font-bold text-primary-500 uppercase mb-2 block">出题方式</span><p class="text-primary-900 font-medium">${data.content.example}</p></div>
-                    <div class="flex gap-4">
-                        <div class="flex-1"><span class="text-[10px] font-bold text-accent-error uppercase block mb-1">陷阱</span><p class="text-xs text-gray-500">${data.content.error}</p></div>
-                        <div class="flex-1"><span class="text-[10px] font-bold text-accent-success uppercase block mb-1">口诀</span><p class="text-xs text-gray-500">${data.content.tip}</p></div>
-                    </div>
-                `;
+                studyPlans.push({ id: Date.now(), name, desc, totalDays: total, completedDays: completed, startDate, status: 'pending', lastCheckIn: null });
             }
-            document.getElementById('preview-content').innerHTML = html;
+            savePlans(); closePlanModal(); refreshPlanUI(); renderPlanList();
         }
+        function removePlan(id) { if (confirm('删除？')) { studyPlans = studyPlans.filter(p => p.id !== id); savePlans(); refreshPlanUI(); renderPlanList(); } }
+        function activatePlan(id) { studyPlans.forEach(p => { if (p.id === id) p.status = 'active'; else if (p.status === 'active') p.status = 'pending'; }); savePlans(); refreshPlanUI(); renderPlanList(); }
 
-        function saveCard() {
-            if (!currentGeneratedCard) return;
-            
-            // 组装最终存入的数据
-            const newCard = {
-                id: Date.now(),
-                ...currentGeneratedCard,
-                level: 0, // 0: 新词, 1: 模糊, 2: 认识, 3: 掌握
-                nextReview: Date.now(), // 立即进入复习队列
-                createdAt: Date.now()
-            };
-
-            db.unshift(newCard); // 插在最前
-            saveDb();
-            
-            alert('保存成功！已加入今日复习计划。');
-            
-            // 重置
-            document.getElementById('input-term').value = '';
-            document.getElementById('preview-area').classList.add('hidden');
-            currentGeneratedCard = null;
-        }
-
-        // --- 模拟 AI 数据生成 ---
-        function getMockAiResponse(term, type) {
-            // 这里用写死的数据模拟大模型的 JSON 返回，实际开发中替换为 API 即可
-            if (type === 'word') {
-                return {
-                    type: "word", title: term, tag: "言语理解 · 高频词",
-                    content: {
-                        summary: "【AI生成】" + term + " 的基本含义。比喻某种特定的状态或行为。",
-                        usage: "在考公中，常用于形容政府治理、政策执行、干部作风等方面的现象。",
-                        example: "面对复杂的社会矛盾，我们不能（" + term + "），而必须坚持具体问题具体分析。",
-                        error: "注意与近义词的区别，本词更强调客观状态，而非主观意图。",
-                        tip: "联想：XX场景下的典型表现。"
-                    }
-                };
-            } else {
-                return {
-                    type: "common", title: term, tag: "常识判断 · 核心考点",
-                    content: {
-                        summary: "【AI生成】" + term + " 是指在特定领域内的一种制度、概念或历史事件。",
-                        points: "1. 确立时间/提出者。2. 核心特征包含三点：A、B、C。3. 历史/现实意义。",
-                        error: "考试中常把此概念与另一个极易混淆的概念张冠李戴，请注意区分主体和客体。",
-                        example: "常考单选题：“关于" + term + "，下列说法正确/错误的是？”",
-                        tip: "口诀：XX第一，YY第二。"
-                    }
-                };
-            }
-        }
-
-        // --- 词库模块 ---
-        function setLibraryFilter(filter, el) {
-            currentFilter = filter;
-            // 更新按钮样式
-            const btns = document.getElementById('library-filters').querySelectorAll('.filter-btn');
-            btns.forEach(btn => {
-                btn.className = "filter-btn whitespace-nowrap px-5 py-2 rounded-xl bg-white text-gray-400 border border-primary-50 text-xs font-bold transition-all";
-            });
-            
-            if (el) {
-                el.className = "filter-btn active whitespace-nowrap px-5 py-2 rounded-xl bg-primary-500 text-white text-xs font-bold shadow-md transition-all";
-            }
-            
-            renderLibrary();
-        }
-
-        function renderLibrary() {
-            const listEl = document.getElementById('library-list');
-            const keyword = document.getElementById('search-input').value.toLowerCase();
-            
-            let filtered = db.filter(item => {
-                const matchKeyword = item.title.toLowerCase().includes(keyword) || item.content.summary.includes(keyword);
-                const matchFilter = currentFilter === 'all' || item.type === currentFilter;
-                return matchKeyword && matchFilter;
-            });
-
-            if (filtered.length === 0) {
-                listEl.innerHTML = `<div class="text-center text-gray-300 py-16 font-medium text-xs">没有找到相关积累</div>`;
+        function renderPlan() {
+            const activePlan = getActivePlan();
+            const board = document.getElementById('plan-board');
+            if (!activePlan) {
+                board.innerHTML = `<div class="flex justify-between items-center mb-4"><h2 class="text-gray-800 text-sm font-bold">备考计划看板</h2><button onclick="switchTab('profile')" class="text-primary-500 text-[10px] font-bold">新增计划</button></div><div class="py-8 text-center"><p class="text-gray-400 text-xs">当前暂无进行中的计划</p></div>`;
                 return;
             }
-
-            let html = '';
-            filtered.forEach(item => {
-                const isWord = item.type === 'word';
-                const tagColor = isWord ? 'text-primary-500 bg-primary-50' : 'text-purple-500 bg-purple-50';
-                
-                let levelStr = "待复习";
-                let levelColor = "bg-gray-100 text-gray-400";
-                if(item.level === 1) { levelStr = "模糊"; levelColor = "bg-orange-50 text-orange-500"; }
-                if(item.level === 2) { levelStr = "认识"; levelColor = "bg-blue-50 text-blue-500"; }
-                if(item.level >= 3) { levelStr = "已掌握"; levelColor = "bg-green-50 text-accent-success"; }
-
-                html += `
-                <div class="bg-white rounded-3xl p-5 shadow-soft border border-primary-50/50 active:scale-[0.99] transition-all">
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="flex items-center gap-3">
-                            <h4 class="font-bold text-gray-900">${item.title}</h4>
-                            <span class="text-[9px] font-bold px-2 py-0.5 rounded-md ${tagColor}">${isWord ? '言语' : '常识'}</span>
-                        </div>
-                        <span class="text-[9px] font-bold px-2 py-1 rounded-full ${levelColor}">${levelStr}</span>
-                    </div>
-                    <p class="text-xs text-gray-400 line-clamp-2 leading-relaxed">${item.content.summary}</p>
-                </div>
-                `;
-            });
-            listEl.innerHTML = html;
-        }
-
-        // --- 复习模块 ---
-        function startReview() {
-            const now = Date.now();
-            // 筛选出需要复习的卡片
-            reviewQueue = db.filter(item => item.nextReview <= now);
+            const percent = Math.min(100, Math.floor((activePlan.completedDays / activePlan.totalDays) * 100)) || 0;
+            const todayStr = new Date().toISOString().slice(0, 10);
+            const isChecked = activePlan.lastCheckIn === todayStr;
             
-            // 如果为了演示，每次至少复习2个，不管时间
-            if (reviewQueue.length === 0 && db.length > 0) {
-                reviewQueue = [...db].sort(() => 0.5 - Math.random()).slice(0, Math.min(db.length, 5));
+            // 提取描述中的板块标签 (兼容 v3 风格)
+            let tagsHtml = '';
+            if (activePlan.desc) {
+                const tags = activePlan.desc.split(/[，,、\s]+/).filter(t => t.length > 0 && t.length < 6).slice(0, 4);
+                tagsHtml = tags.map(tag => `<span class="text-[8px] font-bold text-primary-400 bg-primary-50/50 px-2 py-0.5 rounded-md border border-primary-100/50">${tag}</span>`).join('');
             }
 
+            board.innerHTML = `
+                <div class="flex justify-between items-center mb-4"><h2 class="text-gray-800 text-sm font-bold">备考计划看板</h2><button onclick="switchTab('profile')" class="text-primary-500 text-[10px] font-bold">调整计划</button></div>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-end"><div class="flex flex-col gap-1"><span class="text-xs font-bold text-primary-600 bg-primary-50 px-2 py-1 rounded-lg self-start">${activePlan.name}</span><span class="text-[10px] text-gray-400 font-medium">${activePlan.desc}</span></div><div class="text-right"><span class="text-lg font-black text-primary-500">${percent}%</span></div></div>
+                    <div class="w-full h-2.5 bg-gray-50 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-primary-400 to-purple-500 transition-all duration-700" style="width: ${percent}%"></div></div>
+                    <div class="flex flex-wrap gap-1.5">${tagsHtml}</div>
+                    <div class="flex justify-between items-center pt-2 border-t border-gray-50"><div class="flex flex-col"><span class="text-[9px] font-bold text-gray-300 uppercase tracking-widest">累计进度</span><span class="text-[10px] font-bold text-gray-400">第 ${activePlan.completedDays} / ${activePlan.totalDays} 天</span></div><button onclick="handleCheckIn()" class="${isChecked ? 'bg-gray-100 text-gray-400' : 'bg-primary-500 text-white shadow-md shadow-primary-100'} px-6 py-2 rounded-xl text-xs font-bold active:scale-95 transition-all" ${isChecked ? 'disabled' : ''}>${isChecked ? '今日已完成' : '完成今日计划'}</button></div>
+                </div>`;
+        }
+
+        function handleCheckIn() {
+            const activePlan = getActivePlan(); if (!activePlan) return;
+            const today = new Date().toISOString().slice(0, 10);
+            if (activePlan.lastCheckIn === today) return;
+            activePlan.completedDays++; activePlan.lastCheckIn = today;
+            globalStats.totalCheckIns++; if (!globalStats.checkInHistory.includes(today)) globalStats.checkInHistory.push(today);
+            if (activePlan.completedDays >= activePlan.totalDays) {
+                activePlan.status = 'completed';
+                globalStats.history.unshift({ id: Date.now(), name: activePlan.name, percent: 100, startDate: activePlan.startDate, endDate: today, status: '已完成' });
+                alert('计划已完成！');
+            }
+            savePlans(); refreshPlanUI();
+        }
+
+        function renderStats() {
+            const activePlan = getActivePlan();
+            document.getElementById('stats-total-checkins').innerText = globalStats.totalCheckIns;
+            document.getElementById('stats-mastered-words').innerText = db.filter(i => i.level >= 3).length;
+            if (!activePlan) {
+                document.getElementById('stats-plan-name').innerText = '暂无计划';
+                document.getElementById('stats-plan-days').innerText = '0天';
+                document.getElementById('stats-plan-remain').innerText = '0天';
+                document.getElementById('stats-plan-percent').innerText = '0%';
+                document.getElementById('stats-circle-progress').style.strokeDashoffset = 364.4;
+            } else {
+                document.getElementById('stats-plan-name').innerText = activePlan.name;
+                document.getElementById('stats-plan-days').innerText = activePlan.completedDays + '天';
+                document.getElementById('stats-plan-remain').innerText = Math.max(0, activePlan.totalDays - activePlan.completedDays) + '天';
+                const percent = Math.min(100, Math.floor((activePlan.completedDays / activePlan.totalDays) * 100)) || 0;
+                document.getElementById('stats-plan-percent').innerText = percent + '%';
+                document.getElementById('stats-circle-progress').style.strokeDashoffset = 364.4 - (percent / 100) * 364.4;
+            }
+            const list = document.getElementById('stats-history-list');
+            if (globalStats.history.length === 0) list.innerHTML = '<div class="text-center text-gray-300 text-xs py-4">暂无历史</div>';
+            else list.innerHTML = globalStats.history.map(item => `<div class="bg-white rounded-2xl p-4 border border-primary-50 shadow-sm flex justify-between items-center" onmousedown="handleHistoryTouchStart(${item.id})" onmouseup="handleHistoryTouchEnd()" ontouchstart="handleHistoryTouchStart(${item.id})" ontouchend="handleHistoryTouchEnd()"><div class="flex flex-col gap-1"><span class="text-xs font-bold text-gray-800">${item.name}</span><span class="text-[9px] text-gray-400">${item.startDate} ~ ${item.endDate}</span></div><div class="text-right"><span class="text-xs font-black text-primary-500">${item.percent}%</span><p class="text-[8px] text-gray-300 font-bold uppercase">${item.status}</p></div></div>`).join('');
+        }
+
+        let longPressTimer;
+        function handleHistoryTouchStart(id) {
+            longPressTimer = setTimeout(() => {
+                if (confirm('确定要删除这条历史记录吗？')) {
+                    globalStats.history = globalStats.history.filter(h => h.id !== id);
+                    savePlans();
+                    renderStats();
+                }
+            }, 800);
+        }
+        function handleHistoryTouchEnd() {
+            clearTimeout(longPressTimer);
+        }
+
+        function jumpToLibraryMastered() {
+            switchTab('library');
+            const filterBtn = document.getElementById('filter-mastered');
+            if (filterBtn) setLibraryFilter('mastered', filterBtn);
+        }
+
+        function updateReviewCounts() {
+            const now = Date.now();
+            document.getElementById('review-count-word').innerText = '待复习: ' + db.filter(i => i.type === 'word' && i.nextReview <= now).length;
+            document.getElementById('review-count-common').innerText = '待复习: ' + db.filter(i => i.type === 'common' && i.nextReview <= now).length;
+        }
+
+        function setAddType(t) { currentAddType = t; document.getElementById('tab-type-word').className = t === 'word' ? 'flex-1 py-2.5 text-xs font-bold rounded-xl shadow-sm bg-white text-primary-600' : 'flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-gray-400'; document.getElementById('tab-type-common').className = t === 'common' ? 'flex-1 py-2.5 text-xs font-bold rounded-xl shadow-sm bg-white text-primary-600' : 'flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-gray-400'; }
+        async function generateCard() {
+            const term = document.getElementById('input-term').value.trim(), key = localStorage.getItem('kaogong_ai_key');
+            if (!term || !key) return alert('输入内容并配置 API Key');
+            document.getElementById('btn-generate').disabled = true; document.getElementById('loading-area').classList.remove('hidden');
+            try {
+                const res = await fetch('https://api.deepseek.com/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` }, body: JSON.stringify({ model: "deepseek-chat", messages: [{ role: "system", content: `解析词条。JSON格式。{ "type": "${currentAddType}", "title": "${term}", "tag": "${currentAddType === 'word' ? '言语理解' : '常识判断'}", "content": { "summary": "释义", "usage": "用法", "example": "例句", "error": "辨析", "tip": "口诀" } }` }, { role: "user", content: term }] }) });
+                const data = await res.json(); currentGeneratedCard = JSON.parse(data.choices[0].message.content.replace(/```json|```/g, ''));
+                document.getElementById('preview-title').innerText = currentGeneratedCard.title; document.getElementById('preview-tag').innerText = currentGeneratedCard.tag;
+                document.getElementById('preview-content').innerHTML = `<p>${currentGeneratedCard.content.summary}</p><p class="italic">“${currentGeneratedCard.content.example}”</p>`;
+                document.getElementById('preview-area').classList.remove('hidden');
+            } catch (e) { alert('失败'); } finally { document.getElementById('loading-area').classList.add('hidden'); document.getElementById('btn-generate').disabled = false; }
+        }
+        function saveCard() { db.unshift({ id: Date.now(), ...currentGeneratedCard, level: 0, nextReview: Date.now() }); saveDb(); alert('已保存'); resetAddView(); }
+        function resetAddView() { document.getElementById('preview-area').classList.add('hidden'); document.getElementById('input-term').value = ''; }
+        function setLibraryFilter(f, el) { 
+            currentFilter = f; 
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.remove('bg-primary-500', 'text-white');
+                b.classList.add('bg-white', 'text-gray-400', 'border', 'border-primary-50');
+            });
+            el.classList.add('bg-primary-500', 'text-white');
+            el.classList.remove('bg-white', 'text-gray-400', 'border', 'border-primary-50');
+            renderLibrary(); 
+        }
+        function renderLibrary() {
+            const kw = document.getElementById('search-input').value.toLowerCase();
+            const filtered = db.filter(i => {
+                const matchSearch = i.title.toLowerCase().includes(kw);
+                let matchFilter = false;
+                if (currentFilter === 'all') matchFilter = true;
+                else if (currentFilter === 'mastered') matchFilter = i.level >= 3;
+                else matchFilter = i.type === currentFilter;
+                return matchSearch && matchFilter;
+            });
+            
+            const list = document.getElementById('library-list');
+            if (filtered.length === 0) {
+                list.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-20 text-gray-300">
+                        <i class="fas fa-folder-open text-4xl mb-4"></i>
+                        <p class="text-xs font-bold">暂无相关词条</p>
+                    </div>`;
+            } else {
+                list.innerHTML = filtered.map(i => `
+                    <div class="bg-white rounded-3xl p-5 shadow-soft border border-primary-50 active:scale-[0.99] transition-all cursor-pointer" onclick="showCardDetail(${i.id})">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-gray-800">${i.title}</h4>
+                            <span class="text-[8px] font-bold ${i.level >= 3 ? 'text-accent-success bg-green-50' : 'text-primary-400 bg-primary-50'} px-1.5 py-0.5 rounded">${i.level >= 3 ? '已掌握' : 'Lv.' + i.level}</span>
+                        </div>
+                        <p class="text-xs text-gray-400 line-clamp-2">${i.content.summary}</p>
+                    </div>`).join('');
+            }
+        }
+        function showCardDetail(id) {
+            const item = db.find(i => i.id === id); if (!item) return;
+            curCardId = id;
+            document.getElementById('detail-title').innerText = item.title;
+            document.getElementById('detail-tag').innerText = item.tag;
+            
+            let contentHtml = `<p>${item.content.summary}</p>`;
+            if (item.content.example) contentHtml += `<p class="italic mt-4 text-gray-500">“${item.content.example}”</p>`;
+            if (item.content.usage) contentHtml += `<div class="mt-4 pt-4 border-t border-gray-50"><p class="text-[10px] font-bold text-primary-400 uppercase mb-2">用法解析</p><p class="text-xs text-gray-600">${item.content.usage}</p></div>`;
+            
+            document.getElementById('detail-content').innerHTML = contentHtml;
+            const btnForget = document.getElementById('btn-forget-card');
+            if (item.level >= 3) btnForget.classList.remove('hidden'); else btnForget.classList.add('hidden');
+            document.getElementById('modal-card-detail').classList.remove('hidden');
+        }
+        function closeCardDetail() { document.getElementById('modal-card-detail').classList.add('hidden'); }
+        function forgetCard() { 
+            const i = db.find(x => x.id === curCardId); 
+            if(i) { 
+                i.level = 0; 
+                i.nextReview = Date.now(); 
+                saveDb(); 
+                closeCardDetail(); 
+                if (currentFilter === 'mastered') renderLibrary();
+                alert('已重置并加入复习队列'); 
+            } 
+        }
+        
+        function renderCountdowns() {
+            const container = document.getElementById('countdown-display'); if(!container) return;
+            container.innerHTML = countdowns.map(item => {
+                const diff = Math.ceil((new Date(item.date) - new Date().setHours(0,0,0,0)) / 86400000);
+                return `<div class="flex-shrink-0 bg-gradient-to-br from-primary-500 to-purple-500 rounded-2xl p-4 w-32 shadow-lg"><p class="text-[9px] text-white/70 font-bold mb-1 truncate">${item.name}</p><p class="text-2xl font-black text-white">${diff >= 0 ? diff : '已结束'}天</p></div>`;
+            }).join('');
+        }
+        function renderCountdownSettings() {
+            const list = document.getElementById('countdown-settings-list'); if(!list) return;
+            list.innerHTML = countdowns.map(item => `<div class="p-4 flex justify-between items-center"><div class="flex flex-col"><span class="text-xs font-bold text-gray-700">${item.name}</span><span class="text-[10px] text-gray-400">${item.date}</span></div><div class="flex gap-3"><button onclick="openCountdownModal(${item.id})" class="text-primary-500 text-[10px] font-bold">编辑</button><button onclick="removeCountdown(${item.id})" class="text-accent-error text-[10px] font-bold">删除</button></div></div>`).join('');
+        }
+        let editCid = null;
+        function openCountdownModal(id = null) {
+            editCid = id;
+            if (id) { const item = countdowns.find(i => i.id === id); document.getElementById('modal-input-name').value = item.name; document.getElementById('modal-input-date').value = item.date; }
+            else { document.getElementById('modal-input-name').value = ''; document.getElementById('modal-input-date').value = ''; }
+            document.getElementById('modal-countdown').classList.remove('hidden');
+        }
+        function closeCountdownModal() { document.getElementById('modal-countdown').classList.add('hidden'); }
+        function saveCountdownFromModal() {
+            const n = document.getElementById('modal-input-name').value.trim(), d = document.getElementById('modal-input-date').value;
+            if (!n || !d) return alert('请填写名称和日期');
+            if (editCid) { const i = countdowns.findIndex(x => x.id === editCid); countdowns[i] = { id: editCid, name: n, date: d }; }
+            else countdowns.push({ id: Date.now(), name: n, date: d });
+            localStorage.setItem('kaogong_countdowns', JSON.stringify(countdowns));
+            renderCountdowns(); renderCountdownSettings(); closeCountdownModal();
+        }
+        function removeCountdown(id) { if (confirm('删除？')) { countdowns = countdowns.filter(i => i.id !== id); localStorage.setItem('kaogong_countdowns', JSON.stringify(countdowns)); renderCountdowns(); renderCountdownSettings(); } }
+        function addCountdown() { openCountdownModal(); }
+
+        function showCalendar() { renderCalendar(); document.getElementById('modal-calendar').classList.remove('hidden'); }
+        function closeCalendar() { document.getElementById('modal-calendar').classList.add('hidden'); }
+        let calDate = new Date();
+        function changeCalendarMonth(n) { calDate.setMonth(calDate.getMonth() + n); renderCalendar(); }
+        function renderCalendar() {
+            const y = calDate.getFullYear(), m = calDate.getMonth();
+            document.getElementById('calendar-month-title').innerText = `${y}年 ${m+1}月`;
+            const grid = document.getElementById('calendar-grid'); grid.innerHTML = '';
+            const first = new Date(y, m, 1).getDay(), last = new Date(y, m+1, 0).getDate();
+            let monthCheckIns = 0;
+            for(let i=0; i<first; i++) grid.innerHTML += '<div></div>';
+            for(let i=1; i<=last; i++) {
+                const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+                const isC = globalStats.checkInHistory.includes(ds);
+                if (isC) monthCheckIns++;
+                grid.innerHTML += `<div class="aspect-square flex items-center justify-center rounded-xl text-xs ${isC ? 'bg-accent-success text-white shadow-sm font-bold' : 'bg-gray-50 text-gray-400'}">${i}</div>`;
+            }
+            const footer = document.getElementById('calendar-footer-stats');
+            if (footer) {
+                footer.innerHTML = `本月已打卡 <span class="text-accent-success font-black">${monthCheckIns}</span> 天 · 累计 <span class="text-primary-500 font-black">${globalStats.totalCheckIns}</span> 天`;
+            }
+        }
+
+        function prepareReview(type) {
+            currentReviewType = type; const now = Date.now();
+            reviewQueue = db.filter(i => i.type === type && i.nextReview <= now);
+            if (reviewQueue.length === 0) {
+                const all = db.filter(i => i.type === type);
+                if (all.length === 0) return alert('暂无词条');
+                reviewQueue = [...all].sort(() => 0.5 - Math.random()).slice(0, 5);
+            }
             currentReviewIndex = 0;
+            document.getElementById('review-selector').classList.add('hidden');
+            document.getElementById('review-active').classList.remove('hidden');
             renderReviewCard();
         }
-
+        function exitReview() { document.getElementById('review-selector').classList.remove('hidden'); document.getElementById('review-active').classList.add('hidden'); updateStats(); }
         function renderReviewCard() {
-            const emptyEl = document.getElementById('review-empty');
-            const containerEl = document.getElementById('review-card-container');
-            const cardEl = document.getElementById('flashcard');
-            const actionsEl = document.getElementById('review-actions');
-            
-            // 重置卡片状态
-            cardEl.classList.remove('flipped');
-            actionsEl.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
-
-            if (currentReviewIndex >= reviewQueue.length || reviewQueue.length === 0) {
-                emptyEl.classList.remove('hidden');
-                containerEl.classList.add('hidden');
-                return;
-            }
-
-            emptyEl.classList.add('hidden');
-            containerEl.classList.remove('hidden');
-
+            if (currentReviewIndex >= reviewQueue.length) { document.getElementById('review-active').classList.add('hidden'); document.getElementById('review-empty').classList.remove('hidden'); return; }
             const item = reviewQueue[currentReviewIndex];
-            
-            document.getElementById('review-progress').innerText = `${currentReviewIndex + 1} / ${reviewQueue.length}`;
-            
-            // 渲染正面
             document.getElementById('fc-title').innerText = item.title;
             document.getElementById('fc-tag').innerText = item.tag;
-
-            // 渲染背面
             document.getElementById('fc-back-title').innerText = item.title;
-            let backHtml = '';
-            if (item.type === 'word') {
-                backHtml = `
-                    <div class="space-y-4">
-                        <div class="space-y-1"><span class="text-[10px] font-bold text-primary-400 uppercase tracking-wider">核心释义</span><p class="text-gray-700">${item.content.summary}</p></div>
-                        <div class="p-4 bg-primary-50 rounded-2xl border border-primary-100/50"><span class="text-[10px] font-bold text-primary-500 uppercase mb-2 block">语境例句</span><p class="text-primary-900 font-medium italic">“${item.content.example}”</p></div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="bg-red-50/50 p-3 rounded-xl"><span class="text-[9px] font-bold text-accent-error uppercase block mb-1">易错辨析</span><p class="text-[11px] text-gray-500 leading-snug">${item.content.error}</p></div>
-                            <div class="bg-green-50/50 p-3 rounded-xl"><span class="text-[9px] font-bold text-accent-success uppercase block mb-1">记忆点</span><p class="text-[11px] text-gray-500 leading-snug">${item.content.tip}</p></div>
-                        </div>
-                    </div>
-                `;
-            } else {
-                backHtml = `
-                    <div class="space-y-4">
-                        <div class="space-y-1"><span class="text-[10px] font-bold text-primary-400 uppercase tracking-wider">知识背景</span><p class="text-gray-700">${item.content.summary}</p></div>
-                        <div class="space-y-1"><span class="text-[10px] font-bold text-primary-400 uppercase tracking-wider">核心考点</span><p class="text-gray-700 text-xs">${item.content.points}</p></div>
-                        <div class="p-4 bg-primary-50 rounded-2xl border border-primary-100/50"><span class="text-[10px] font-bold text-primary-500 uppercase mb-2 block">典型考法</span><p class="text-primary-900 font-medium text-xs">${item.content.example}</p></div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="bg-red-50/50 p-3 rounded-xl"><span class="text-[9px] font-bold text-accent-error uppercase block mb-1">常识陷阱</span><p class="text-[11px] text-gray-500 leading-snug">${item.content.error}</p></div>
-                            <div class="bg-green-50/50 p-3 rounded-xl"><span class="text-[9px] font-bold text-accent-success uppercase block mb-1">秒杀口诀</span><p class="text-[11px] text-gray-500 leading-snug">${item.content.tip}</p></div>
-                        </div>
-                    </div>
-                `;
-            }
-            document.getElementById('fc-back-content').innerHTML = backHtml;
+            document.getElementById('fc-back-content').innerHTML = `<p>${item.content.summary}</p><p class='italic mt-4'>“${item.content.example}”</p>`;
+            document.getElementById('flashcard').classList.remove('flipped');
+            document.getElementById('review-actions').classList.add('opacity-0', 'pointer-events-none');
+            document.getElementById('review-progress').innerText = `${currentReviewIndex + 1} / ${reviewQueue.length}`;
         }
-
-        function flipCard() {
-            const cardEl = document.getElementById('flashcard');
-            const actionsEl = document.getElementById('review-actions');
-            if (!cardEl.classList.contains('flipped')) {
-                cardEl.classList.add('flipped');
-                // 激活底部按钮
-                actionsEl.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-            }
-        }
-
-        function submitReview(quality) {
-            // quality: 0(不会), 1(模糊), 2(掌握)
+        function flipCard() { document.getElementById('flashcard').classList.add('flipped'); document.getElementById('review-actions').classList.remove('opacity-0', 'pointer-events-none'); }
+        function submitReview(q) {
             const item = reviewQueue[currentReviewIndex];
-            
-            // 简化的间隔重复算法
-            const HOUR = 60 * 60 * 1000;
-            const DAY = 24 * HOUR;
-
-            if (quality === 0) {
-                item.level = Math.max(0, item.level - 1);
-                item.nextReview = Date.now() + 1 * HOUR; // 1小时后再次复习
-            } else if (quality === 1) {
-                item.level = Math.max(1, item.level);
-                item.nextReview = Date.now() + 12 * HOUR; // 半天后复习
-            } else if (quality === 2) {
-                item.level += 1;
-                // 根据级别决定下次复习时间
-                let interval = 1 * DAY;
-                if (item.level === 2) interval = 3 * DAY;
-                if (item.level === 3) interval = 7 * DAY;
-                if (item.level > 3) interval = 15 * DAY;
-                item.nextReview = Date.now() + interval;
-            }
-
-            // 更新到总库
-            const dbIndex = db.findIndex(i => i.id === item.id);
-            if(dbIndex > -1) {
-                db[dbIndex] = item;
-                saveDb();
-            }
-
-            // 下一张
-            currentReviewIndex++;
-            renderReviewCard();
+            if (q === 0) item.level = 0; else if (q === 1) item.level = Math.max(0, item.level - 1); else item.level++;
+            const days = [0, 1, 3, 7, 15, 30][Math.min(item.level, 5)];
+            item.nextReview = Date.now() + days * 86400000;
+            saveDb(); currentReviewIndex++; renderReviewCard();
         }
 
+        function saveAiConfig() { localStorage.setItem('kaogong_ai_key', document.getElementById('ai-api-key').value.trim()); alert('已保存'); }
+        function loadAiConfig() { document.getElementById('ai-api-key').value = localStorage.getItem('kaogong_ai_key') || ''; }
+        function exportData() { const data = {db, plans: studyPlans, stats: globalStats, countdowns}; const blob = new Blob([JSON.stringify(data)], {type: 'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'kaogong_v4.json'; a.click(); }
+        function importData() {
+            const input = document.createElement('input'); input.type = 'file';
+            input.onchange = e => {
+                const reader = new FileReader();
+                reader.onload = re => {
+                    const d = JSON.parse(re.target.result);
+                    if (d.db) db = d.db; if (d.plans) studyPlans = d.plans; if (d.stats) globalStats = d.stats; if (d.countdowns) countdowns = d.countdowns;
+                    saveDb(); savePlans(); location.reload();
+                };
+                reader.readAsText(e.target.files[0]);
+            };
+            input.click();
+        }
+        function clearData() { if (confirm('确定清空？')) { localStorage.clear(); location.reload(); } }
+        function initMockData() { db = [{id: 1, type: 'word', title: '示例词条', tag: '言语', content: {summary: '解析示例', example: '例句示例'}, level: 0, nextReview: 0}]; saveDb(); }
+
+        function switchTab(tabId, subType = null) {
+            document.querySelectorAll('.view').forEach(el => { el.classList.remove('active'); el.style.display = 'none'; });
+            document.querySelectorAll('.nav-item').forEach(el => { el.classList.remove('active', 'text-primary-600'); el.classList.add('text-gray-300'); });
+            const activeView = document.getElementById('view-' + tabId);
+            if (activeView) { activeView.classList.add('active'); activeView.style.display = 'block'; }
+            const activeNav = document.getElementById('nav-' + tabId);
+            if (activeNav) { activeNav.classList.add('active', 'text-primary-600'); activeNav.classList.remove('text-gray-300'); }
+            const titles = { 'home': '公考积累', 'add': '新增卡片', 'library': '我的词库', 'stats': '数据中心', 'review': '复习', 'profile': '个人中心' };
+            if (document.getElementById('header-title')) document.getElementById('header-title').innerText = titles[tabId];
+            
+            // 每次切换标签页时更新统计
+            updateStats();
+
+            if (tabId === 'add') { resetAddView(); if(subType) setAddType(subType); } 
+            else if (tabId === 'library') renderLibrary();
+            else if (tabId === 'stats') renderStats();
+            else if (tabId === 'review') exitReview();
+            else if (tabId === 'home') { renderCountdowns(); renderPlan(); }
+            else if (tabId === 'profile') { renderCountdownSettings(); renderPlan(); renderPlanList(); }
+        }
+
+        function refreshPlanUI() { renderPlan(); renderStats(); updateStats(); }
+        function saveDb() { localStorage.setItem('kaogong_db', JSON.stringify(db)); updateStats(); refreshPlanUI(); }
+
+        // --- PWA Service Worker 注册 ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').then(reg => {
+                    console.log('Service Worker 注册成功');
+                }).catch(err => {
+                    console.log('Service Worker 注册失败:', err);
+                });
+            });
+        }
     </script>
 </body>
 </html>
