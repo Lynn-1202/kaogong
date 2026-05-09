@@ -237,19 +237,26 @@
             <!-- 生成结果预览 -->
             <div id="preview-area" class="hidden bg-white rounded-3xl shadow-soft p-6 border border-primary-50 relative animate-fadeIn">
                 <div class="flex justify-between items-start mb-6">
-                    <div>
-                        <h3 id="preview-title" class="text-xl font-bold text-gray-900 mb-1"></h3>
-                        <span id="preview-tag" class="text-[10px] font-bold text-primary-500 bg-primary-50 px-2 py-0.5 rounded-md"></span>
+                    <div class="flex-1">
+                        <input type="text" id="preview-title" class="w-full text-xl font-bold text-gray-900 mb-1 bg-transparent border-none focus:ring-0 p-0" placeholder="标题">
+                        <span id="preview-tag" class="text-[10px] font-bold text-primary-500 bg-primary-50 px-2 py-0.5 rounded-md inline-block"></span>
                     </div>
-                    <div class="text-[10px] font-bold text-gray-300 uppercase">AI 解析结果</div>
+                    <div class="text-[10px] font-bold text-gray-300 uppercase shrink-0">AI 解析结果 (可编辑)</div>
                 </div>
                 
                 <div class="space-y-5 text-sm leading-relaxed" id="preview-content">
-                    <!-- 动态填充内容 -->
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">核心释义</label>
+                        <textarea id="preview-summary" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-xs focus:ring-2 focus:ring-primary-400 min-h-[80px]" placeholder="释义"></textarea>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">用法解析/例句</label>
+                        <textarea id="preview-usage" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-xs focus:ring-2 focus:ring-primary-400 min-h-[80px]" placeholder="用法或例句"></textarea>
+                    </div>
                 </div>
 
                 <button onclick="saveCard()" class="w-full mt-8 bg-accent-success text-white rounded-2xl py-4 font-bold shadow-md active:scale-[0.98] transition-all">
-                    确认积累
+                    保存并收录
                 </button>
             </div>
             
@@ -589,17 +596,40 @@
         </div>
     </div>
 
-    <!-- 词条详情弹窗 -->
+    <!-- 词条详情/编辑弹窗 -->
     <div id="modal-card-detail" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm transition-all">
         <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] scale-up">
             <div class="p-6 border-b border-gray-50 flex justify-between items-center">
-                <div><h3 id="detail-title" class="text-xl font-bold text-gray-900"></h3><span id="detail-tag" class="text-[10px] font-bold text-primary-500 bg-primary-50 px-2 py-0.5 rounded-md mt-1 inline-block"></span></div>
+                <div class="flex-1 mr-4">
+                    <input type="text" id="detail-title" class="w-full text-xl font-bold text-gray-900 bg-transparent border-none focus:ring-0 p-0" placeholder="标题" readonly>
+                    <span id="detail-tag" class="text-[10px] font-bold text-primary-500 bg-primary-50 px-2 py-0.5 rounded-md mt-1 inline-block"></span>
+                </div>
                 <button onclick="closeCardDetail()" class="text-gray-300 hover:text-gray-500 p-2"><i class="fas fa-times text-xl"></i></button>
             </div>
-            <div class="flex-1 overflow-y-auto p-6 space-y-6" id="detail-content"></div>
+            <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                <div class="space-y-4" id="detail-display-mode">
+                    <div id="detail-content-view" class="space-y-6"></div>
+                </div>
+                <div class="space-y-4 hidden" id="detail-edit-mode">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">核心释义</label>
+                        <textarea id="edit-summary" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-400 min-h-[120px]"></textarea>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">用法解析/例句</label>
+                        <textarea id="edit-usage" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-400 min-h-[120px]"></textarea>
+                    </div>
+                </div>
+            </div>
             <div class="p-6 bg-gray-50/50 border-t border-gray-50 space-y-3">
-                <button id="btn-forget-card" onclick="forgetCard()" class="hidden w-full bg-orange-50 text-orange-500 py-4 rounded-2xl font-bold text-xs">记不清了，重新加入复习</button>
-                <button onclick="closeCardDetail()" class="w-full bg-white border border-gray-200 text-gray-500 py-4 rounded-2xl font-bold text-xs">已阅</button>
+                <div id="detail-footer-normal" class="space-y-3">
+                    <button id="btn-edit-card" onclick="toggleEditMode(true)" class="w-full bg-primary-500 text-white py-4 rounded-2xl font-bold text-xs shadow-md">编辑词条内容</button>
+                    <button id="btn-forget-card" onclick="forgetCard()" class="hidden w-full bg-orange-50 text-orange-500 py-4 rounded-2xl font-bold text-xs">记不清了，重新加入复习</button>
+                </div>
+                <div id="detail-footer-edit" class="hidden grid grid-cols-2 gap-3">
+                    <button onclick="toggleEditMode(false)" class="w-full bg-white border border-gray-200 text-gray-500 py-4 rounded-2xl font-bold text-xs">取消</button>
+                    <button onclick="updateExistingCard()" class="w-full bg-accent-success text-white py-4 rounded-2xl font-bold text-xs shadow-md">保存修改</button>
+                </div>
             </div>
         </div>
     </div>
@@ -863,17 +893,81 @@
         function setAddType(t) { currentAddType = t; document.getElementById('tab-type-word').className = t === 'word' ? 'flex-1 py-2.5 text-xs font-bold rounded-xl shadow-sm bg-white text-primary-600' : 'flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-gray-400'; document.getElementById('tab-type-common').className = t === 'common' ? 'flex-1 py-2.5 text-xs font-bold rounded-xl shadow-sm bg-white text-primary-600' : 'flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-gray-400'; }
         async function generateCard() {
             const term = document.getElementById('input-term').value.trim(), key = localStorage.getItem('kaogong_ai_key');
-            if (!term || !key) return alert('输入内容并配置 API Key');
-            document.getElementById('btn-generate').disabled = true; document.getElementById('loading-area').classList.remove('hidden');
+            if (!term) return alert('请输入词条内容');
+            if (!key) return alert('请先在个人中心配置 API Key');
+            
+            document.getElementById('btn-generate').disabled = true; 
+            document.getElementById('loading-area').classList.remove('hidden');
+            document.getElementById('preview-area').classList.add('hidden');
+
             try {
-                const res = await fetch('https://api.deepseek.com/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` }, body: JSON.stringify({ model: "deepseek-chat", messages: [{ role: "system", content: `解析词条。JSON格式。{ "type": "${currentAddType}", "title": "${term}", "tag": "${currentAddType === 'word' ? '言语理解' : '常识判断'}", "content": { "summary": "释义", "usage": "用法", "example": "例句", "error": "辨析", "tip": "口诀" } }` }, { role: "user", content: term }] }) });
-                const data = await res.json(); currentGeneratedCard = JSON.parse(data.choices[0].message.content.replace(/```json|```/g, ''));
-                document.getElementById('preview-title').innerText = currentGeneratedCard.title; document.getElementById('preview-tag').innerText = currentGeneratedCard.tag;
-                document.getElementById('preview-content').innerHTML = `<p>${currentGeneratedCard.content.summary}</p><p class="italic">“${currentGeneratedCard.content.example}”</p>`;
+                const res = await fetch('https://api.deepseek.com/chat/completions', { 
+                    method: 'POST', 
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'Authorization': `Bearer ${key.trim()}` 
+                    }, 
+                    body: JSON.stringify({ 
+                        model: "deepseek-chat", 
+                        messages: [
+                            { role: "system", content: `你是一个专业的公考助教。请解析用户提供的词条，并严格按照以下 JSON 格式返回，不要有任何其他描述文字：{ "type": "${currentAddType}", "title": "${term}", "tag": "${currentAddType === 'word' ? '言语理解' : '常识判断'}", "content": { "summary": "这里写核心释义，要求准确简洁", "usage": "这里写用法解析、近义词辨析或相关考点例句" } }` }, 
+                            { role: "user", content: term }
+                        ],
+                        response_format: { type: "json_object" } // 强制要求返回 JSON
+                    }) 
+                });
+
+                if (!res.ok) {
+                    const errData = await res.json().catch(() => ({}));
+                    if (res.status === 401) throw new Error('API Key 无效或已过期，请检查配置');
+                    if (res.status === 402) throw new Error('API 余额不足');
+                    throw new Error(errData.error?.message || `请求失败 (状态码: ${res.status})`);
+                }
+
+                const data = await res.json(); 
+                let content = data.choices[0].message.content.trim();
+                
+                // 更鲁棒的 JSON 提取逻辑
+                try {
+                    // 如果 AI 还是带了 Markdown 标签，尝试剥离
+                    if (content.includes('```')) {
+                        content = content.replace(/```json|```/g, '').trim();
+                    }
+                    currentGeneratedCard = JSON.parse(content);
+                } catch (parseErr) {
+                    console.error('JSON Parse Error:', content);
+                    throw new Error('AI 返回内容格式解析失败，请重试');
+                }
+                
+                // 填充预览区域的可编辑输入框
+                document.getElementById('preview-title').value = currentGeneratedCard.title || term; 
+                document.getElementById('preview-tag').innerText = currentGeneratedCard.tag;
+                document.getElementById('preview-summary').value = currentGeneratedCard.content?.summary || '';
+                document.getElementById('preview-usage').value = currentGeneratedCard.content?.usage || currentGeneratedCard.content?.example || '';
+                
                 document.getElementById('preview-area').classList.remove('hidden');
-            } catch (e) { alert('失败'); } finally { document.getElementById('loading-area').classList.add('hidden'); document.getElementById('btn-generate').disabled = false; }
+            } catch (e) { 
+                console.error(e);
+                alert('解析失败: ' + e.message); 
+            } finally { 
+                document.getElementById('loading-area').classList.add('hidden'); 
+                document.getElementById('btn-generate').disabled = false; 
+            }
         }
-        function saveCard() { db.unshift({ id: Date.now(), ...currentGeneratedCard, level: 0, nextReview: Date.now() }); saveDb(); alert('已保存'); resetAddView(); }
+        function saveCard() { 
+            // 从输入框获取最终内容
+            const finalCard = {
+                ...currentGeneratedCard,
+                title: document.getElementById('preview-title').value.trim(),
+                content: {
+                    ...currentGeneratedCard.content,
+                    summary: document.getElementById('preview-summary').value.trim(),
+                    usage: document.getElementById('preview-usage').value.trim()
+                }
+            };
+            db.unshift({ id: Date.now(), ...finalCard, level: 0, nextReview: Date.now() }); 
+            saveDb(); alert('已保存'); resetAddView(); 
+        }
         function resetAddView() { document.getElementById('preview-area').classList.add('hidden'); document.getElementById('input-term').value = ''; }
         function setLibraryFilter(f, el) { 
             currentFilter = f; 
@@ -917,18 +1011,75 @@
         function showCardDetail(id) {
             const item = db.find(i => i.id === id); if (!item) return;
             curCardId = id;
-            document.getElementById('detail-title').innerText = item.title;
+            
+            // 设置标题和标签
+            document.getElementById('detail-title').value = item.title;
             document.getElementById('detail-tag').innerText = item.tag;
             
-            let contentHtml = `<p>${item.content.summary}</p>`;
-            if (item.content.example) contentHtml += `<p class="italic mt-4 text-gray-500">“${item.content.example}”</p>`;
-            if (item.content.usage) contentHtml += `<div class="mt-4 pt-4 border-t border-gray-50"><p class="text-[10px] font-bold text-primary-400 uppercase mb-2">用法解析</p><p class="text-xs text-gray-600">${item.content.usage}</p></div>`;
+            // 渲染显示模式内容
+            let contentHtml = `<div class="space-y-4">
+                <div class="space-y-1"><span class="text-[10px] font-bold text-primary-400 uppercase tracking-wider">核心释义</span><p class="text-gray-700">${item.content.summary}</p></div>`;
+            if (item.content.usage || item.content.example) {
+                contentHtml += `<div class="space-y-1"><span class="text-[10px] font-bold text-primary-400 uppercase tracking-wider">用法/例句</span><p class="text-gray-700">${item.content.usage || item.content.example}</p></div>`;
+            }
+            contentHtml += `</div>`;
+            document.getElementById('detail-content-view').innerHTML = contentHtml;
             
-            document.getElementById('detail-content').innerHTML = contentHtml;
+            // 填充编辑模式内容
+            document.getElementById('edit-summary').value = item.content.summary;
+            document.getElementById('edit-usage').value = item.content.usage || item.content.example || '';
+            
+            // 重置为显示模式
+            toggleEditMode(false);
+            
             const btnForget = document.getElementById('btn-forget-card');
             if (item.level >= 3) btnForget.classList.remove('hidden'); else btnForget.classList.add('hidden');
             document.getElementById('modal-card-detail').classList.remove('hidden');
         }
+
+        function toggleEditMode(isEdit) {
+            const displayMode = document.getElementById('detail-display-mode');
+            const editMode = document.getElementById('detail-edit-mode');
+            const footerNormal = document.getElementById('detail-footer-normal');
+            const footerEdit = document.getElementById('detail-footer-edit');
+            const titleInput = document.getElementById('detail-title');
+
+            if (isEdit) {
+                displayMode.classList.add('hidden');
+                editMode.classList.remove('hidden');
+                footerNormal.classList.add('hidden');
+                footerEdit.classList.remove('hidden');
+                titleInput.classList.remove('bg-transparent');
+                titleInput.classList.add('bg-gray-50', 'rounded-lg', 'px-2');
+                titleInput.readOnly = false;
+            } else {
+                displayMode.classList.remove('hidden');
+                editMode.classList.add('hidden');
+                footerNormal.classList.remove('hidden');
+                footerEdit.classList.add('hidden');
+                titleInput.classList.add('bg-transparent');
+                titleInput.classList.remove('bg-gray-50', 'rounded-lg', 'px-2');
+                titleInput.readOnly = true;
+            }
+        }
+
+        function updateExistingCard() {
+            const item = db.find(i => i.id === curCardId);
+            if (!item) return;
+
+            item.title = document.getElementById('detail-title').value.trim();
+            item.content.summary = document.getElementById('edit-summary').value.trim();
+            const usageVal = document.getElementById('edit-usage').value.trim();
+            // 同时更新 usage 和 example 以保持兼容
+            item.content.usage = usageVal;
+            item.content.example = usageVal;
+
+            saveDb();
+            renderLibrary();
+            showCardDetail(curCardId); // 刷新显示
+            alert('修改已保存');
+        }
+
         function closeCardDetail() { document.getElementById('modal-card-detail').classList.add('hidden'); }
         function forgetCard() { 
             const i = db.find(x => x.id === curCardId); 
