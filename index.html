@@ -1,3 +1,5 @@
+<!-- 2026-05-10 版本5.0 bug修复 -->
+ <!-- 收录词条已存在显示重复 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -138,6 +140,32 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
         }
+        /* Toast 样式 */
+        #toast-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .toast {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        }
+        .toast.show {
+            opacity: 1;
+            transform: scale(1);
+        }
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -149,6 +177,8 @@
 </head>
 <body class="text-gray-900">
     <div class="app-container">
+        <!-- Toast 容器 -->
+        <div id="toast-container"></div>
         <!-- 顶部标题栏 -->
         <header class="glass-effect sticky top-0 z-50 px-6 py-4 flex justify-between items-center border-b border-primary-100/50">
             <h1 class="text-xl font-bold text-primary-600 tracking-tight" id="header-title">公考积累</h1>
@@ -668,6 +698,24 @@
         let currentReviewIndex = 0;
         let currentReviewType = null;
 
+        // --- 通用工具 ---
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerText = message;
+            container.appendChild(toast);
+            
+            // 触发动画
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            // 1秒后淡出并移除
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 1000);
+        }
+
         // --- 初始化 ---
         window.onload = () => {
             updateStats();
@@ -894,6 +942,13 @@
         async function generateCard() {
             const term = document.getElementById('input-term').value.trim(), key = localStorage.getItem('kaogong_ai_key');
             if (!term) return alert('请输入词条内容');
+
+            // 检查词库中是否已存在
+            if (db.some(i => i.title.toLowerCase() === term.toLowerCase())) {
+                showToast('词条已收录');
+                return;
+            }
+
             if (!key) return alert('请先在个人中心配置 API Key');
             
             document.getElementById('btn-generate').disabled = true; 
@@ -966,7 +1021,9 @@
                 }
             };
             db.unshift({ id: Date.now(), ...finalCard, level: 0, nextReview: Date.now() }); 
-            saveDb(); alert('已保存'); resetAddView(); 
+            saveDb(); 
+            showToast('收录成功');
+            resetAddView(); 
         }
         function resetAddView() { document.getElementById('preview-area').classList.add('hidden'); document.getElementById('input-term').value = ''; }
         function setLibraryFilter(f, el) { 
@@ -999,13 +1056,91 @@
                     </div>`;
             } else {
                 list.innerHTML = filtered.map(i => `
-                    <div class="bg-white rounded-3xl p-5 shadow-soft border border-primary-50 active:scale-[0.99] transition-all cursor-pointer" onclick="showCardDetail(${i.id})">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-bold text-gray-800">${i.title}</h4>
-                            <span class="text-[8px] font-bold ${i.level >= 3 ? 'text-accent-success bg-green-50' : 'text-primary-400 bg-primary-50'} px-1.5 py-0.5 rounded">${i.level >= 3 ? '已掌握' : 'Lv.' + i.level}</span>
+                    <div class="relative overflow-hidden rounded-3xl group">
+                        <!-- 删除背景层 -->
+                        <div class="absolute inset-0 bg-accent-error flex items-center justify-end px-6 text-white font-bold text-xs">
+                            <span>松手删除</span>
                         </div>
-                        <p class="text-xs text-gray-400 line-clamp-2">${i.content.summary}</p>
+                        <!-- 卡片主体 -->
+                        <div class="bg-white rounded-3xl p-5 shadow-soft border border-primary-50 active:scale-[0.99] transition-all cursor-pointer relative z-10" 
+                            onclick="showCardDetail(${i.id})"
+                            ontouchstart="handleItemTouchStart(event, ${i.id})"
+                            ontouchmove="handleItemTouchMove(event, ${i.id})"
+                            ontouchend="handleItemTouchEnd(event, ${i.id})">
+                            <div class="flex justify-between items-start mb-2">
+                                <h4 class="font-bold text-gray-800">${i.title}</h4>
+                                <span class="text-[8px] font-bold ${i.level >= 3 ? 'text-accent-success bg-green-50' : 'text-primary-400 bg-primary-50'} px-1.5 py-0.5 rounded">${i.level >= 3 ? '已掌握' : 'Lv.' + i.level}</span>
+                            </div>
+                            <p class="text-xs text-gray-400 line-clamp-2">${i.content.summary}</p>
+                        </div>
                     </div>`).join('');
+            }
+        }
+
+        // --- 词库触摸交互逻辑 ---
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchTimer = null;
+        let currentTouchItem = null;
+        let isSwiping = false;
+
+        function handleItemTouchStart(e, id) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            currentTouchItem = e.currentTarget;
+            isSwiping = false;
+
+            // 长按计时器 (800ms)
+            touchTimer = setTimeout(() => {
+                confirmDelete(id);
+            }, 800);
+        }
+
+        function handleItemTouchMove(e, id) {
+            const touchX = e.touches[0].clientX;
+            const touchY = e.touches[0].clientY;
+            const deltaX = touchX - touchStartX;
+            const deltaY = touchY - touchStartY;
+
+            // 如果滑动距离超过一定值，取消长按计时
+            if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
+                clearTimeout(touchTimer);
+            }
+
+            // 左滑交互效果
+            if (deltaX < -10 && Math.abs(deltaY) < 30) {
+                if (e.cancelable) e.preventDefault(); // 阻止滚动
+                isSwiping = true;
+                const moveX = Math.max(deltaX, -100);
+                currentTouchItem.style.transform = `translateX(${moveX}px)`;
+            }
+        }
+
+        function handleItemTouchEnd(e, id) {
+            clearTimeout(touchTimer);
+            if (isSwiping) {
+                const touchX = e.changedTouches[0].clientX;
+                const deltaX = touchX - touchStartX;
+                
+                if (deltaX < -70) {
+                    // 触发删除
+                    confirmDelete(id);
+                }
+                
+                // 恢复原状
+                currentTouchItem.style.transform = 'translateX(0)';
+                isSwiping = false;
+            }
+        }
+
+        function confirmDelete(id) {
+            const item = db.find(i => i.id === id);
+            if (!item) return;
+            if (confirm(`确定要删除“${item.title}”吗？`)) {
+                db = db.filter(i => i.id !== id);
+                saveDb();
+                renderLibrary();
+                showToast('已删除');
             }
         }
         function showCardDetail(id) {
@@ -1077,7 +1212,7 @@
             saveDb();
             renderLibrary();
             showCardDetail(curCardId); // 刷新显示
-            alert('修改已保存');
+            showToast('修改已保存');
         }
 
         function closeCardDetail() { document.getElementById('modal-card-detail').classList.add('hidden'); }
@@ -1089,7 +1224,7 @@
                 saveDb(); 
                 closeCardDetail(); 
                 if (currentFilter === 'mastered') renderLibrary();
-                alert('已重置并加入复习队列'); 
+                showToast('已重置并加入复习队列'); 
             } 
         }
         
@@ -1180,7 +1315,7 @@
             saveDb(); currentReviewIndex++; renderReviewCard();
         }
 
-        function saveAiConfig() { localStorage.setItem('kaogong_ai_key', document.getElementById('ai-api-key').value.trim()); alert('已保存'); }
+        function saveAiConfig() { localStorage.setItem('kaogong_ai_key', document.getElementById('ai-api-key').value.trim()); showToast('配置已保存'); }
         function loadAiConfig() { document.getElementById('ai-api-key').value = localStorage.getItem('kaogong_ai_key') || ''; }
         function exportData() { const data = {db, plans: studyPlans, stats: globalStats, countdowns}; const blob = new Blob([JSON.stringify(data)], {type: 'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'kaogong_v4.json'; a.click(); }
         function importData() {
