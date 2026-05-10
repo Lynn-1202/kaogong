@@ -1056,14 +1056,17 @@
                     </div>`;
             } else {
                 list.innerHTML = filtered.map(i => `
-                    <div class="relative overflow-hidden rounded-3xl group">
+                    <div class="relative overflow-hidden rounded-3xl group mb-4 last:mb-0">
                         <!-- 删除背景层 -->
-                        <div class="absolute inset-0 bg-accent-error flex items-center justify-end px-6 text-white font-bold text-xs">
-                            <span>松手删除</span>
+                        <div class="absolute inset-0 bg-accent-error flex items-center justify-end z-0">
+                            <button onclick="confirmDelete(${i.id})" class="h-full px-8 text-white font-bold text-sm flex items-center gap-2 active:bg-red-600 transition-colors">
+                                <i class="fas fa-trash-alt"></i>
+                                删除
+                            </button>
                         </div>
                         <!-- 卡片主体 -->
-                        <div class="bg-white rounded-3xl p-5 shadow-soft border border-primary-50 active:scale-[0.99] transition-all cursor-pointer relative z-10" 
-                            onclick="showCardDetail(${i.id})"
+                        <div class="bg-white rounded-3xl p-5 shadow-soft border border-primary-50 transition-transform duration-300 ease-out cursor-pointer relative z-10" 
+                            onclick="handleItemClick(event, ${i.id})"
                             ontouchstart="handleItemTouchStart(event, ${i.id})"
                             ontouchmove="handleItemTouchMove(event, ${i.id})"
                             ontouchend="handleItemTouchEnd(event, ${i.id})">
@@ -1080,20 +1083,20 @@
         // --- 词库触摸交互逻辑 ---
         let touchStartX = 0;
         let touchStartY = 0;
-        let touchTimer = null;
         let currentTouchItem = null;
         let isSwiping = false;
+        let swipedItem = null; // 记录当前处于滑动状态的项
 
         function handleItemTouchStart(e, id) {
+            // 如果点击的不是当前已滑出的项，先重置已滑出的项
+            if (swipedItem && swipedItem !== e.currentTarget) {
+                resetSwipedItem();
+            }
+
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
             currentTouchItem = e.currentTarget;
             isSwiping = false;
-
-            // 长按计时器 (800ms)
-            touchTimer = setTimeout(() => {
-                confirmDelete(id);
-            }, 800);
         }
 
         function handleItemTouchMove(e, id) {
@@ -1102,34 +1105,63 @@
             const deltaX = touchX - touchStartX;
             const deltaY = touchY - touchStartY;
 
-            // 如果滑动距离超过一定值，取消长按计时
-            if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
-                clearTimeout(touchTimer);
-            }
-
             // 左滑交互效果
             if (deltaX < -10 && Math.abs(deltaY) < 30) {
                 if (e.cancelable) e.preventDefault(); // 阻止滚动
                 isSwiping = true;
                 const moveX = Math.max(deltaX, -100);
+                currentTouchItem.style.transition = 'none'; // 滑动时取消过渡动画
+                currentTouchItem.style.transform = `translateX(${moveX}px)`;
+            } else if (deltaX > 10 && swipedItem === currentTouchItem) {
+                // 右滑重置
+                const moveX = Math.min(0, -80 + deltaX);
+                currentTouchItem.style.transition = 'none';
                 currentTouchItem.style.transform = `translateX(${moveX}px)`;
             }
         }
 
         function handleItemTouchEnd(e, id) {
-            clearTimeout(touchTimer);
+            if (!currentTouchItem) return;
+            currentTouchItem.style.transition = 'transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28)';
+            
             if (isSwiping) {
                 const touchX = e.changedTouches[0].clientX;
                 const deltaX = touchX - touchStartX;
                 
-                if (deltaX < -70) {
-                    // 触发删除
-                    confirmDelete(id);
+                if (deltaX < -50) {
+                    // 保持滑出状态
+                    currentTouchItem.style.transform = 'translateX(-80px)';
+                    swipedItem = currentTouchItem;
+                } else {
+                    // 恢复原状
+                    currentTouchItem.style.transform = 'translateX(0)';
+                    swipedItem = null;
                 }
-                
-                // 恢复原状
-                currentTouchItem.style.transform = 'translateX(0)';
                 isSwiping = false;
+            } else if (swipedItem === currentTouchItem) {
+                // 如果是已滑出状态下的普通点击，且没有发生滑动，判断位移
+                const touchX = e.changedTouches[0].clientX;
+                if (touchX - touchStartX > 20) {
+                    resetSwipedItem();
+                }
+            }
+        }
+
+        function handleItemClick(e, id) {
+            // 如果当前项已滑出，点击它是为了收起
+            if (swipedItem === e.currentTarget) {
+                resetSwipedItem();
+                return;
+            }
+            // 否则正常打开详情
+            showCardDetail(id);
+        }
+
+        function resetSwipedItem() {
+            if (swipedItem) {
+                swipedItem.style.transition = 'transform 0.3s ease';
+                swipedItem.style.transform = 'translateX(0)';
+                swipedItem = null;
             }
         }
 
@@ -1139,8 +1171,11 @@
             if (confirm(`确定要删除“${item.title}”吗？`)) {
                 db = db.filter(i => i.id !== id);
                 saveDb();
+                swipedItem = null; // 删除后清除状态
                 renderLibrary();
                 showToast('已删除');
+            } else {
+                resetSwipedItem(); // 取消删除也重置状态
             }
         }
         function showCardDetail(id) {
